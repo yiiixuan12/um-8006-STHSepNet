@@ -1,0 +1,41 @@
+{
+  "experiment_id": "reproduce/baseline_mlp_adaptive_bike_bert",
+  "claim": "STH-SepNet with BERT backbone, adaptive hypergraph gate (--adaptive_hyperhgnn hgat, --fusion_gate adaptive, --static False), BIKE-Inflow, reproduces the paper's reported MAE/RMSE within the team's re-derived baseline",
+  "paper_reference": "STH-SepNet KDD'25 Table (BIKE-Inflow MAE 5.18 / RMSE 14.40; these are sanity references, our own baseline is authoritative)",
+  "reproduction_tier": "scaled-faithful",
+  "dataset": "BIKE-Inflow",
+  "llm_backbone": "google-bert/bert-base-uncased",
+  "fusion_gate": "adaptive",
+  "static": false,
+  "adaptive_hyperhgnn": "hgat",
+  "seeds": [2021, 42, 7],
+  "fixed_hyperparams": {
+    "task_name": "long_term_forecast",
+    "features": "M",
+    "seq_len": 48,
+    "label_len": 48,
+    "pred_len": 48,
+    "d_model": 768,
+    "d_ff": 32,
+    "llm_layers": 6,
+    "llm_dim": 768,
+    "factor": 3,
+    "enc_in": 295,
+    "dec_in": 295,
+    "c_out": 295,
+    "node_num": 295,
+    "scale_hyperedges": 3,
+    "gamma": 1.0,
+    "batch_size": 16,
+    "learning_rate": 0.0001,
+    "train_epochs": 50,
+    "itr": 1
+  },
+  "metric": {
+    "primary": ["MAE", "RMSE"],
+    "secondary": ["MAPE (robust, |y_true|>=1)"],
+    "eval": "eval_metrics.py (see scripts/eval_metrics.py)"
+  },
+  "command_template": "python run_main.py --task_name long_term_forecast --is_training 1 --root_path ./dataset/Bike/ --data_path inflow.csv --model_id BIKE_48_48 --model pool --data inflow --features M --seq_len 48 --label_len 48 --pred_len 48 --factor 3 --des Exp --itr 1 --d_model 768 --d_ff 32 --batch_size 16 --learning_rate 0.0001 --llm_model BERT --llm_dim 768 --llm_layers 6 --train_epochs 50 --gamma 1.0 --fusion_gate adaptive --enc_in 295 --dec_in 295 --c_out 295 --node_num 295 --scale_hyperedges 3 --seed <SEED> --num_workers 0",
+  "notes": "MLP prediction head (FlattenHead). One run per seed; 3 runs total. The --num_workers 0 and DeepSpeed-off (STHS_USE_DS=0) are the single-GPU default."
+}
