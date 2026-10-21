@@ -1,3 +1,0 @@
-dataset,LLM,prediction_head,MAE,MAE_sd,RMSE,RMSE_sd,robust_MAPE_pct,head_params,total_params,epochs,sec_per_epoch
-BIKE-Inflow,BERT,MLP (baseline),5.2570,0.0302,14.1383,0.0462,77.42,9264,109219949,"50/41/36 (early-stop)",181
-BIKE-Inflow,BERT,KANLinear (grid=5,k=3),5.1006,0.0240,13.4306,0.0908,80.17,103680,109314365,50x3,181
