@@ -10,7 +10,7 @@
 python -m pip install -r requirements-pilot.txt
 ```
 
-本地使用 PyTorch 2.10.0+cu128、Transformers 4.44.2。不要使用旧的 `requirements.txt` 安装。
+本地使用 PyTorch 2.10.0+cu128、Transformers 4.44.2。依赖清单为 `requirements-pilot.txt`，不包含需单独安装的 PyTorch。
 
 ## 2. 下载资源
 
