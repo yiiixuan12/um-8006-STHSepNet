@@ -1,0 +1,6 @@
+# Failed / negative experiments registry + concise evidence summary.
+# Required by the course: preserve all pilot results, including negative ones.
+# Fill in rows as pilots run. A negative result earns full credit if honestly
+# reported and evidence-linked.
+experiment,hypothesis,prediction,outcome,evidence_path,notes
+kan_grid_ablation_pilot,"H2: larger grid/spline increases expressiveness but may overfit on the 48-step head",expected diminishing returns,negative-or-null (fill),results/logs/kan_grid_ablation*,"If no clear gain beyond grid=5, record it here and keep grid=5 for full eval"
