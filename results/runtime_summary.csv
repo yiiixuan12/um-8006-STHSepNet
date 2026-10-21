@@ -1,0 +1,7 @@
+tag,epochs,s_per_epoch
+baseline_s2021,50,181
+baseline_s42,41,181
+baseline_s7,36,181
+kan_s2021,50,181
+kan_s42,50,181
+kan_s7,50,181
