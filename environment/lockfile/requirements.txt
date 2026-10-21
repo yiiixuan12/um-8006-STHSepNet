@@ -1,0 +1,38 @@
+# ------------------------------------------------------------------
+# Locked core dependencies for the STH-SepNet course project.
+# These pin the versions that were validated on the reference machine
+# (the team's GPU host, Windows conda env `sths`, Python 3.10,
+# torch 2.6.0+cu124). Full reproducibility uses these pins.
+# ------------------------------------------------------------------
+# Core tensor / ML
+torch==2.6.0
+numpy==1.24.2
+pandas==2.0.3
+scipy==1.10.1
+scikit-learn==1.2.2
+einops==0.6.1
+
+# LLM branch (BERT / GPT-2)
+transformers==4.31.0
+accelerate==0.21.0
+huggingface-hub==0.15.1
+safetensors==0.3.1
+sentencepiece==0.1.99
+tokenizers==0.13.3
+
+# Misc
+tqdm
+PyYAML
+matplotlib==3.7.1
+pytest>=6.2
+
+# ------------------------------------------------------------------
+# NOTE
+# - On a CUDA machine install the matching torch build, e.g.:
+#     pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+# - For a CPU-only smoke test the same pins work (torch CPU build):
+#     pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+# - The upstream requirements.txt is a large, partly-commented dump of the
+#   authors' environment; we use this focused locked subset instead and record
+#   the deviation in report/.
+# - Version of Python used at validation: 3.10.
