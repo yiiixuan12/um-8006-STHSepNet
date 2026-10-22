@@ -14,8 +14,6 @@ formatting is not logged.
 - No credentials, personal data, or restricted material appear in this file or its
   logs.
 
-> Team-member name is kept as `{Member}` (GUO JINFENG) — replace with the real
-> name before the Week 12 freeze if policy requires real names.
 
 All evidence paths are relative to this repository root (`sths-repro/`).
 
