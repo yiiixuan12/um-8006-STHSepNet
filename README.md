@@ -68,23 +68,56 @@ python -u research/run_coursework.py --dataset pems03 --seed 2021 --stage improv
 
 ### 3.3 KAN 预测头（H3，BIKE-Inflow）
 
-KAN 试点与原版 MLP 基线使用**完全相同的训练脚本、数据划分、LLM 骨干（BERT）、`fusion_gate`（adaptive）、超参数与种子集合**，唯一受控变量为预测头类型。种子沿用早期冻结消融的 `2021/42/7`（与主线 H1 的 `2021/2022/2023` 是不同集合，跨实验比较时需注明）。
+KAN 试点与原版 MLP 基线使用完全相同的训练脚本、数据划分、LLM 骨干（BERT）、fusion_gate=adaptive、超参数与训练预算。唯一受控变量是预测头类型：--use_kan。门控融合模块内部的线性层不改动；KAN 头的 in_features/out_features 与原 MLP 完全一致（192 → 48），不引入额外历史输入，因此 H3 与基线是等信息化对比。
 
-- **已验证入口**（sths-repro，`src/run_main.py`）：在基线命令后追加 KAN 开关
+替换点：仅替换门控融合之后、输出最终预测的 MLP 头 FlattenHead.linear: nn.Linear(192, 48) → KANLinear(192, 48; grid_size=5, spline_order=3)。
+
+KAN 网格自适应细化：刻意关闭 update_grid，保证对比干净。
+
+种子：2021 / 42 / 7（与主线 H1 的 2021 / 2022 / 2023 是不同集合，跨实验比较时不能按种子配对）。
+
+数据：dataset/Bike/inflow.csv；BERT 权重放在 huggingface/google_bert/。
+
+环境修复共用：seed 生效、Windows spawn 保护、checkpoint key 前缀修复、dtype 适配、本地路径修复等由基线与 KAN 共用同一份代码，不属于科学变量。
+
+3.3.1 BIKE-Inflow MLP 基线命令（无 --use_kan）
 
   ```bash
   python -u src/run_main.py --task_name long_term_forecast --is_training 1 \
-    --root_path ./dataset/Bike/ --data_path inflow.csv --model_id BIKE_48_48 \
-    --model pool --data inflow --features M --seq_len 48 --label_len 48 --pred_len 48 \
-    --d_model 768 --d_ff 32 --batch_size 16 --learning_rate 0.0001 --train_epochs 50 \
-    --fusion_gate adaptive --enc_in 295 --dec_in 295 --c_out 295 --node_num 295 \
-    --scale_hyperedges 3 --llm_model BERT --llm_dim 768 --llm_layers 6 \
-    --seed 2021 --use_kan --kan_grid_size 5 --kan_spline_order 3
+  --root_path ./dataset/Bike/ --data_path inflow.csv --model_id BIKE_48_48 \
+  --model pool --data inflow --features M --seq_len 48 --label_len 48 --pred_len 48 \
+  --factor 3 --des Exp --itr 1 --d_model 768 --d_ff 32 --batch_size 16 \
+  --learning_rate 0.0001 --llm_model BERT --llm_dim 768 --llm_layers 6 \
+  --train_epochs 50 --model_comment abl --gamma 1.0 --fusion_gate adaptive \
+  --enc_in 295 --dec_in 295 --c_out 295 --node_num 295 --scale_hyperedges 3 \
+  --seed 2021 --num_workers 0
   ```
 
-  完整参数与 `configs/improvement/kan_adaptive_bike_bert.json` 一一对应；另两个种子将 `--seed` 改为 `42`、`7`。
+3.3.2 KAN 预测头命令（仅追加 KAN 开关）
+  ```bash
 
-- **统一入口**：若 `run_coursework.py` 已按第 6.1 节的替换点接入等价 `--use_kan` / `--stage kan` 分支，则按该入口参数运行，替换点与结论不变（以代码为准）。
+python -u src/run_main.py --task_name long_term_forecast --is_training 1 \
+  --root_path ./dataset/Bike/ --data_path inflow.csv --model_id BIKE_48_48 \
+  --model pool --data inflow --features M --seq_len 48 --label_len 48 --pred_len 48 \
+  --factor 3 --des Exp --itr 1 --d_model 768 --d_ff 32 --batch_size 16 \
+  --learning_rate 0.0001 --llm_model BERT --llm_dim 768 --llm_layers 6 \
+  --train_epochs 50 --model_comment abl --gamma 1.0 --fusion_gate adaptive \
+  --enc_in 295 --dec_in 295 --c_out 295 --node_num 295 --scale_hyperedges 3 \
+  --seed 2021 --use_kan --kan_grid_size 5 --kan_spline_order 3 --num_workers 0
+  ```
+
+另两个种子将 --seed 分别改为 42、7，其余参数完全一致。每个种子单独保存日志、预测/真值数组和 report.json，不要覆盖已有 run。
+3.3.3 冒烟与验证
+在跑正式 3 seeds 前，至少完成：
+
+1.sanity.py：随机 batch (2, 48, 295) 下 MLP/KAN 双版本 forward + backward 通过；参数量符合预期（MLP 头 9,264；KAN 头 103,680；总参数差 94,416）。
+
+2.1-epoch 全流程冒烟：训练 → checkpoint 保存/加载 → vali_save → 清理，exit 0。
+
+3.指标复算：用 eval_metrics.py / collect_results.py 从保存的 .npy 重新计算 MAE/RMSE/robust MAPE，不直接信任训练日志中的打印值。
+
+3.3.4 统一入口说明
+若 run_coursework.py 已接入等价 --use_kan / --stage kan 分支，可按统一入口运行；替换点、唯一变量和结论不变。以当前仓库代码为准，并在 README 中记录实际使用的入口。
 
 ### 3.4 公共说明
 
@@ -126,10 +159,15 @@ KAN 试点与原版 MLP 基线使用**完全相同的训练脚本、数据划分
 
 ### 6.1 动机、替换点与替换方式
 
-原模型在门控融合之后使用固定激活的 MLP 预测头（`FlattenHead.linear = nn.Linear(192, 48)`），表达能力有限；KAN 以**可学习的 B 样条基函数**替代固定激活，能够更自适应地捕捉融合特征到预测目标之间的复杂非线性映射。
+原模型在门控融合之后使用固定激活的 MLP 预测头（FlattenHead.linear = nn.Linear(192, 48)），表达能力有限；KAN 以可学习的 B 样条基函数替代固定激活，更自适应地捕捉融合特征到预测目标之间的复杂非线性映射。
 
-- **替换点**：仅替换门控融合模块之后、用于输出最终预测的 MLP 预测头；**不修改门控融合机制内部的线性层**，保证消融只反映预测头这一变量。
-- **替换方式**：`nn.Linear(192, 48)` → `KANLinear(192, 48; grid_size=5, spline_order=3)`，`in_features`/`out_features` 与原 MLP 完全一致；网格自适应细化（`update_grid`）刻意关闭，保证对比干净。
+替换点：仅替换门控融合之后、用于输出最终预测的 MLP 预测头；不修改门控融合机制内部的线性层，保证消融只反映预测头这一变量。
+
+替换方式：nn.Linear(192, 48) → KANLinear(192, 48; grid_size=5, spline_order=3)，输入输出维度与原 MLP 完全一致。
+
+控制：关闭 update_grid 网格自适应细化；不引入额外历史输入；不改变 BERT、超图分支、门控融合或训练预算。
+
+公平性：基线与 KAN 共用同一修正版基线、同一环境适配修复、同一数据划分、同一 seeds 集合、同一 epoch/patience 规则；唯一科学变量是 --use_kan。
 
 ### 6.2 试点与结果（BIKE-Inflow，3 seeds：2021/42/7）
 
