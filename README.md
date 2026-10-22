@@ -28,7 +28,7 @@ python -m pip install -r requirements-pilot.txt
 
 ### 2.2 KAN 预测头数据集（H3：BIKE-Inflow）
 
-- **数据集**：BIKE-Inflow 是北京共享单车系统的流入流量（295 个站点，5 分钟粒度），由原作者在官方仓库中提供；其时空周期性与高峰模式是验证预测头表达能力切换的合适基准。
+- **数据集**：BIKE-Inflow 由原作者在官方仓库中提供(https://drive.google.com/drive/folders/1uhQqAdrIplhhKCHn0McnB-trve6_rATD?usp=drive_link)；其时空周期性与高峰模式是验证预测头表达能力切换的合适基准。
 - **下载**：从 [STH-SepNet 官方仓库](https://github.com/jiawenchen10/STHSepNet) 的 `dataset/Bike/inflow.csv` 获取（MIT 许可，与主线数据集同源）；如原作者 Google Drive 镜像包含 Bike 目录，亦可从该处下载。
 - **放置**：`dataset/Bike/inflow.csv`（无需邻接矩阵，自适应超图按官方配置在训练时构建）。
 
