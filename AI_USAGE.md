@@ -47,7 +47,7 @@ All evidence paths are relative to this repository root.
   output 48 steps, identical to baseline.
 - **Evidence:**
   - Code: `src/models/ST_SepNet.py` (`FlattenHead`, gate call), `src/layers/STHGNN.py` (fusion coefficient `r`)
-  - Report: `report/final_report.md` §6.1 / §7
+  - Report: `report/final_report.md` 
   - Agent log: `logs/agents/2026-08-22_kan_paper_review.md`
 - **Sanitization:** none required; only public paper and repo code.
 
@@ -133,7 +133,7 @@ All evidence paths are relative to this repository root.
 - **Evidence:**
   - Recompute: `scripts/eval_metrics.py`, `scripts/collect_results.py`
   - Data: `results/data_pred/*.npy`
-  - Report: `report/final_report.md` §5 / §8.2 / §10 (MAPE caveat)
+  - Report: `report/final_report.md` 
   - Agent log: `logs/agents/2026-10-08_kan_result_review.md`
 - **Sanitization:** none.
 
@@ -161,7 +161,7 @@ All evidence paths are relative to this repository root.
 - **Evidence:**
   - Config: `configs/improvement/kan_adaptive_bike_bert.json`, `configs/improvement/kan_grid_ablation_pilot.json`
   - Registry: `experiments/registry.csv`
-  - Report: `report/final_report.md` §7 / §8 / §9 (selection rule and H3 controlled ablation)
+  - Report: `report/final_report.md` 
   - Agent log: `logs/agents/2026-10-15_kan_adversarial_review.md`
 - **Sanitization:** none.
 
@@ -179,7 +179,7 @@ All evidence paths are relative to this repository root.
 - **Human verification:** checked params 9,264 vs 103,680 (total Δ 94,416, +0.09%);
   checked 3/3-seed direction; confirmed the robust-MAPE degradation is written into limitations.
 - **Evidence:**
-  - Report: `report/final_report.md` §7 / §8.2 / §10 (params, per-seed, robust MAPE, limitations)
+  - Report: `report/final_report.md` 
   - Registry: `experiments/registry.csv`
   - Agent log: `logs/agents/2026-10-20_kan_ablation_plan.md`
 - **Sanitization:** none.
