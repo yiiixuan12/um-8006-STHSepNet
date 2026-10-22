@@ -1,7 +1,7 @@
 # AI_USAGE — Consequential-Interaction Ledger
 
 This file records every **consequential** coding-agent interaction performed for the
-KAN prediction-head improvement (H3). A consequence is an interaction that changed,
+STH-SepNet improvement. A consequence is an interaction that changed,
 or could reasonably change, a claim, the code, a config, data processing, a metric,
 a result, or a project decision. Routine autocomplete / spelling / low-stakes
 formatting is not logged.
