@@ -15,7 +15,7 @@ formatting is not logged.
   logs.
 
 
-All evidence paths are relative to this repository root (`sths-repro/`).
+All evidence paths are relative to this repository root.
 
 ---
 
