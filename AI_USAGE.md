@@ -14,7 +14,7 @@ formatting is not logged.
 - No credentials, personal data, or restricted material appear in this file or its
   logs.
 
-> Team-member name is kept as `{Member}` (the KAN 负责人) — replace with the real
+> Team-member name is kept as `{Member}` (GUO JINFENG) — replace with the real
 > name before the Week 12 freeze if policy requires real names.
 
 All evidence paths are relative to this repository root (`sths-repro/`).
@@ -23,7 +23,7 @@ All evidence paths are relative to this repository root (`sths-repro/`).
 
 ## Ledger
 
-### AI-KAN-001 — 2026-08-22 — KAN 负责人
+### AI-KAN-001 — 2026-08-22 — GUO JINFENG
 - **Stage:** Paper understanding / reproduction planning
 - **Tool / model / version:** DeepSeek V4.1 Flash · 2026-08-22 · default settings
   (temperature not exposed → *not exposed*)
@@ -53,7 +53,7 @@ All evidence paths are relative to this repository root (`sths-repro/`).
   - Agent log: `logs/agents/2026-08-22_kan_paper_review.md`
 - **Sanitization:** none required; only public paper and repo code.
 
-### AI-KAN-002 — 2026-08-28 — KAN 负责人
+### AI-KAN-002 — 2026-08-28 — GUO JINFENG
 - **Stage:** Codebase audit / reproduction planning
 - **Tool / model / version:** Gemini 3 Pro · 2026-08-28 · default settings (*not exposed*)
 - **Delegated task:** audit the insertion point of `FlattenHead`, `fusion_gate=adaptive`,
@@ -75,7 +75,7 @@ All evidence paths are relative to this repository root (`sths-repro/`).
   - Agent log: `logs/agents/2026-08-28_kan_code_audit.md`
 - **Sanitization:** none; stack traces had local absolute paths replaced with `[REDACTED: local path]`.
 
-### AI-KAN-003 — 2026-09-05 — KAN 负责人
+### AI-KAN-003 — 2026-09-05 — GUO JINFENG
 - **Stage:** Implementation / testing / debugging
 - **Tool / model / version:** DeepSeek V4.1 Flash · 2026-09-05 · default settings (*not exposed*)
 - **Delegated task:** implement the `KANLinear(192, 48; grid_size=5, spline_order=3)`
@@ -95,7 +95,7 @@ All evidence paths are relative to this repository root (`sths-repro/`).
   - Agent log: `logs/agents/2026-09-05_kan_impl_debug.md`
 - **Sanitization:** none; stack traces had local absolute paths removed.
 
-### AI-KAN-004 — 2026-09-18 — KAN 负责人
+### AI-KAN-004 — 2026-09-18 — GUO JINFENG
 - **Stage:** Experiment execution / debugging
 - **Tool / model / version:** Gemini 3 Pro · 2026-09-18 · default settings (*not exposed*)
 - **Delegated task:** help write the 3-seed (`2021/42/7`) MLP/KAN comparison runs; check
@@ -117,7 +117,7 @@ All evidence paths are relative to this repository root (`sths-repro/`).
   - Agent log: `logs/agents/2026-09-18_kan_run_debug.md`
 - **Sanitization:** none.
 
-### AI-KAN-005 — 2026-10-08 — KAN 负责人
+### AI-KAN-005 — 2026-10-08 — GUO JINFENG
 - **Stage:** Result analysis / adversarial review
 - **Tool / model / version:** DeepSeek V4.1 Flash · 2026-10-08 · default settings (*not exposed*)
 - **Delegated task:** analyze the BIKE-Inflow 3-seed results; judge whether KAN is
@@ -139,7 +139,7 @@ All evidence paths are relative to this repository root (`sths-repro/`).
   - Agent log: `logs/agents/2026-10-08_kan_result_review.md`
 - **Sanitization:** none.
 
-### AI-KAN-006 — 2026-10-15 — KAN 负责人 — **critical-review episode**
+### AI-KAN-006 — 2026-10-15 — GUO JINFENG — **critical-review episode**
 - **Stage:** Improvement design / adversarial review
 - **Tool / model / version:** Gemini 3 Pro · 2026-10-15 · default settings (*not exposed*)
 - **Delegated task:** adversarially review H3 — find confounders, decide whether to
@@ -167,7 +167,7 @@ All evidence paths are relative to this repository root (`sths-repro/`).
   - Agent log: `logs/agents/2026-10-15_kan_adversarial_review.md`
 - **Sanitization:** none.
 
-### AI-KAN-007 — 2026-10-20 — KAN 负责人
+### AI-KAN-007 — 2026-10-20 — GUO JINFENG
 - **Stage:** Improvement design / ablation planning
 - **Tool / model / version:** DeepSeek V4.1 Flash · 2026-10-20 · default settings (*not exposed*)
 - **Delegated task:** design a fair ablation for H3 that separates the "head-type effect"
