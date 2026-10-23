@@ -1,0 +1,11 @@
+# Results-to-artifacts traceability table.
+# Every reported claim/figure/table links to an exact config, command, registered
+# run, and saved output. Columns: claim | config | command | run_id | artifact_path | figure_or_table
+claim,config,command,run_id,artifact_path,figure_or_table
+"Reproduction baseline: STH-SepNet + BERT + adaptive gate, MLP head, 3 seeds",configs/reproduce/baseline_mlp_adaptive_bike_bert.json,"python run_main.py --task_name long_term_forecast --is_training 1 --root_path ./dataset/Bike/ --data_path inflow.csv --model_id BIKE_48_48 --model pool --data inflow --features M --seq_len 48 --label_len 48 --pred_len 48 --factor 3 --des Exp --itr 1 --d_model 768 --d_ff 32 --batch_size 16 --learning_rate 0.0001 --llm_model BERT --llm_dim 768 --llm_layers 6 --train_epochs 50 --gamma 1.0 --fusion_gate adaptive --enc_in 295 --dec_in 295 --c_out 295 --node_num 295 --scale_hyperedges 3 --seed <SEED> --num_workers 0",baseline_s2021,results/data_pred/baseline_s2021_{pred,true}.npy,"report/report.md Table 1; figure 1"
+"Reproduction baseline (seed 2)",configs/reproduce/baseline_mlp_adaptive_bike_bert.json,<same command --seed 42>,baseline_s42,results/data_pred/baseline_s42_{pred,true}.npy,"report/report.md Table 1"
+"Reproduction baseline (seed 3)",configs/reproduce/baseline_mlp_adaptive_bike_bert.json,<same command --seed 7>,baseline_s7,results/data_pred/baseline_s7_{pred,true}.npy,"report/report.md Table 1"
+"Improvement full eval: KAN head (grid=5,k=3), 3 seeds",configs/improvement/kan_adaptive_bike_bert.json,"python run_main.py <baseline command> --use_kan --kan_grid_size 5 --kan_spline_order 3 --seed <SEED> --num_workers 0",kan_s2021,results/data_pred/kan_s2021_{pred,true}.npy,"report/report.md Table 2; figure 2"
+"Improvement full eval (seed 2)",configs/improvement/kan_adaptive_bike_bert.json,<same command --seed 42>,kan_s42,results/data_pred/kan_s42_{pred,true}.npy,"report/report.md Table 2"
+"Improvement full eval (seed 3)",configs/improvement/kan_adaptive_bike_bert.json,<same command --seed 7>,kan_s7,results/data_pred/kan_s7_{pred,true}.npy,"report/report.md Table 2"
+"Official-code audit: static vs adaptive_hyperhgnn branches",configs/reproduce/static_mlp_adaptive_gate_off.json,"python run_main.py <baseline command> --static True --seed <SEED>",static_s2021,tests/test_static_adaptive.py + results/,"report/report.md §7"

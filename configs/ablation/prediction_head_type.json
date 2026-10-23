@@ -1,0 +1,15 @@
+{
+  "experiment_id": "ablation/prediction_head_type",
+  "claim": "Ablation isolating the single variable 'prediction head type' (MLP vs KANLinear) under identical frozen protocol",
+  "dataset": "BIKE-Inflow",
+  "llm_backbone": "google-bert/bert-base-uncased",
+  "fusion_gate": "adaptive",
+  "seeds": [2021, 42, 7],
+  "variants": [
+    {"name": "mlp", "extra": ""},
+    {"name": "kan_grid5_k3", "extra": "--use_kan --kan_grid_size 5 --kan_spline_order 3"}
+  ],
+  "fixed_hyperparams": {"same_as": "reproduce/baseline_mlp_adaptive_bike_bert.json"},
+  "command_template": "python run_main.py <baseline args> <EXTRA> --seed <SEED> --num_workers 0",
+  "notes": "Results for this ablation are the MLP-vs-KAN comparison in report/; registry rows reference both reproduce and improvement configs."
+}

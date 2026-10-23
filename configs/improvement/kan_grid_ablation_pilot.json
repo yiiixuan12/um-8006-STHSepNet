@@ -1,0 +1,18 @@
+{
+  "experiment_id": "improvement/kan_grid_ablation_pilot",
+  "claim": "Pilot: KAN head sensitivity to grid_size (3 vs 5 vs 8) and spline_order, to test the expressiveness-versus-parameters trade-off and identify the best KAN head for the full evaluation",
+  "hypothesis": "H2: increasing KAN grid_size/spline_order raises prediction-head parameters and expressiveness but with diminishing returns / possible overfitting on the 48-step BIKE head.",
+  "reproduction_tier": "improvement (pilot)",
+  "dataset": "BIKE-Inflow",
+  "llm_backbone": "google-bert/bert-base-uncased",
+  "fusion_gate": "adaptive",
+  "seeds": [2021],
+  "kan_grid_variants": [
+    {"grid_size": 3, "spline_order": 3},
+    {"grid_size": 5, "spline_order": 3},
+    {"grid_size": 8, "spline_order": 3},
+    {"grid_size": 5, "spline_order": 2}
+  ],
+  "command_template": "python run_main.py <baseline args> --use_kan --kan_grid_size <G> --kan_spline_order <K> --seed 2021 --num_workers 0",
+  "notes": "Pilot runs feed the selection of the full-evaluation KAN config. Negative/diminishing results are preserved in experiments/negative_registry.csv."
+}

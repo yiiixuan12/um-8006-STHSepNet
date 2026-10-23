@@ -1,0 +1,22 @@
+{
+  "experiment_id": "reproduce/static_mlp_adaptive_gate_off",
+  "claim": "Independently auditing the --static branch: with --static True the STHGNN module uses the static adjacency, isolating the effect of the adaptive hypergraph construction",
+  "paper_reference": "STH-SepNet ablation: adaptive hypergraph vs static adjacency",
+  "reproduction_tier": "component (audit of --static vs --adaptive_hyperhgnn branches)",
+  "dataset": "BIKE-Inflow",
+  "llm_backbone": "google-bert/bert-base-uncased",
+  "fusion_gate": "adaptive",
+  "static": true,
+  "adaptive_hyperhgnn": "hgat",
+  "seeds": [2021, 42, 7],
+  "fixed_hyperparams": {
+    "same_as": "reproduce/baseline_mlp_adaptive_bike_bert.json"
+  },
+  "metric": {
+    "primary": ["MAE", "RMSE"],
+    "secondary": ["MAPE (robust)"],
+    "eval": "eval_metrics.py"
+  },
+  "command_template": "python run_main.py <baseline args> --static True --seed <SEED> --num_workers 0",
+  "notes": "Only the --static flag differs from the adaptive baseline. Purpose: satisfy the official-code rule (independent audit/test of the static vs adaptive_hyperhgnn branches). These are additional runs; if compute-limited, the same branch switching is covered by tests/test_static_adaptive.py on a synthetic graph."
+}

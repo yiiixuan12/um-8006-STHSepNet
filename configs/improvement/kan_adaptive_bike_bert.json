@@ -1,0 +1,27 @@
+{
+  "experiment_id": "improvement/kan_adaptive_bike_bert",
+  "claim": "Replacing the MLP prediction head (FlattenHead) with a KANLinear head (B-spline basis, grid_size=5, spline_order=3) reduces MAE/RMSE on BIKE-Inflow relative to the frozen MLP baseline, under identical hyperparameters and seeds",
+  "hypothesis": "H1 (mechanism): the learnable B-spline basis of KAN captures the non-linear mapping from the fused spatio-temporal features to the prediction target better than the fixed-activation MLP head; KAN heads have been identified as the highest-impact replacement position in time-series tasks.",
+  "reproduction_tier": "improvement (full evaluation)",
+  "dataset": "BIKE-Inflow",
+  "llm_backbone": "google-bert/bert-base-uncased",
+  "fusion_gate": "adaptive",
+  "static": false,
+  "adaptive_hyperhgnn": "hgat",
+  "seeds": [2021, 42, 7],
+  "fixed_hyperparams": {
+    "same_as": "reproduce/baseline_mlp_adaptive_bike_bert.json"
+  },
+  "kan": {
+    "use_kan": true,
+    "kan_grid_size": 5,
+    "kan_spline_order": 3
+  },
+  "metric": {
+    "primary": ["MAE", "RMSE"],
+    "secondary": ["MAPE (robust)", "head params", "total params", "s/epoch"],
+    "eval": "eval_metrics.py"
+  },
+  "command_template": "python run_main.py <baseline args> --use_kan --kan_grid_size 5 --kan_spline_order 3 --seed <SEED> --num_workers 0",
+  "notes": "Single controlled variable vs baseline = prediction head type (MLP -> KANLinear). Gate fusion internals untouched. 3 seeds, identical everything else."
+}

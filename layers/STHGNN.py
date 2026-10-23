@@ -47,7 +47,7 @@ class prop(nn.Module):
         self.alpha = alpha
 
     def forward(self,x,adj):
-        adj = adj.to(device=x.device, dtype=x.dtype) + torch.eye(adj.size(0), device=x.device, dtype=x.dtype)
+        adj = adj + torch.eye(adj.size(0)).to(x.device).to(torch.float32)
         d = adj.sum(1)
         h = x
         dv = d
@@ -69,7 +69,7 @@ class mixprop(nn.Module):
 
 
     def forward(self,x,adj):
-        adj = adj.to(device=x.device, dtype=x.dtype) + torch.eye(adj.size(0), device=x.device, dtype=x.dtype)
+        adj = adj + torch.eye(adj.size(0)).to(x.device).to(torch.float32)
         # print(type(adj))
         d = adj.sum(1)
         h = x
@@ -197,8 +197,7 @@ class LayerNorm(nn.Module):
 
 class sthypergnn(nn.Module):
     def __init__(self, gcn_true, hgcn_true, hgat_true, buildA_true,buildH_true, gcn_depth, 
-                 num_nodes,num_hyperedges, device, adaptive_hyperhgnn,temporl_true,static,
-                 hypergraph_source='fixed_topology', predefined_A=None, static_feat=None, dropout=0.3,
+                 num_nodes,num_hyperedges, device, adaptive_hyperhgnn,temporl_true,static,  predefined_A=None, static_feat=None, dropout=0.3, 
                  subgraph_size=20, node_dim=40, dilation_exponential=1,  conv_channels=32,
                    residual_channels=32, skip_channels=64, end_channels=128,  seq_length=12, 
                    in_dim=2, out_dim=12, layers=3, propalpha=0.05, tanhalpha=3,  layer_norm_affline=True, 
@@ -210,43 +209,23 @@ class sthypergnn(nn.Module):
         self.hgat_true = hgat_true
         self.buildH_true = buildH_true
         self.adaptive_hyperhgnn = adaptive_hyperhgnn
-        self.hypergraph_source = hypergraph_source
         self.temporl_true = temporl_true 
         self.static = static
 
-        gamma = min(max(float(gamma), 1e-4), 1.0 - 1e-4)
-        self.gamma_logit = nn.Parameter(torch.tensor(math.log(gamma / (1.0 - gamma))))
+        self.gamma = nn.Parameter(torch.tensor(gamma, dtype=torch.float32))
+        self.alpha = nn.Parameter(torch.tensor(alpha, dtype=torch.float32))
+        self.beta = nn.Parameter(torch.tensor(beta, dtype=torch.float32))
+        self.theta = nn.Parameter(torch.tensor(theta , dtype=torch.float32))
+        self.param = self.gamma + self.alpha + self.beta + self.theta 
 
 
         self.num_nodes = num_nodes
         self.num_hyperedges = num_hyperedges
         self.scale_hyperedges = scale_hyperedges
         self.dropout = dropout
-        # Keep the physical adjacency with the module so ``model.to(device)``
-        # moves it once.  The upstream implementation left this as a plain CPU
-        # attribute and copied it to CUDA on every forward pass, which both
-        # wastes time and contaminates latency comparisons between K values.
-        if predefined_A is None:
-            self.register_buffer('predefined_A', None)
-        else:
-            self.register_buffer(
-                'predefined_A',
-                torch.as_tensor(predefined_A, dtype=torch.float32),
-            )
-        true_adj_tensor = torch.as_tensor(true_adj, dtype=torch.float32).clone().detach()
-        self.register_buffer('true_adj', true_adj_tensor)
-        topology_support = (true_adj_tensor != 0) | (true_adj_tensor.T != 0)
-        topology_support.fill_diagonal_(True)
-        fixed_incidence = topology_support.to(torch.float32)
-        node_degree = fixed_incidence.sum(dim=1).clamp_min(1.0)
-        edge_degree = fixed_incidence.sum(dim=0).clamp_min(1.0)
-        fixed_incidence_norm = (
-            node_degree.rsqrt().unsqueeze(1)
-            * fixed_incidence
-            * edge_degree.rsqrt().unsqueeze(0)
-        )
-        self.register_buffer('fixed_incidence', fixed_incidence)
-        self.register_buffer('fixed_incidence_norm', fixed_incidence_norm)
+        self.predefined_A = predefined_A
+         
+        self.true_adj = torch.tensor(true_adj).to(torch.float32)
         self.filter_convs = nn.ModuleList()
         self.gate_convs = nn.ModuleList()
         self.residual_convs = nn.ModuleList()
@@ -254,7 +233,6 @@ class sthypergnn(nn.Module):
         self.gconv1 = nn.ModuleList()
         self.gconv2 = nn.ModuleList()
         self.gconv3 = nn.ModuleList()
-        self.hypergraph_layers = nn.ModuleList()
         self.norm = nn.ModuleList()
         self.start_conv = nn.Conv2d(in_channels=in_dim,
                                     out_channels=residual_channels,
@@ -266,15 +244,7 @@ class sthypergnn(nn.Module):
 
 
         # construct high-order hypergraph module
-        self.hgc = (
-            hgypergraph_constructor(
-                num_nodes, num_hyperedges, node_dim, device,
-                scale_hyperedges=scale_hyperedges, alpha=tanhalpha,
-                static_feat=static_feat, metric='knn',
-            )
-            if hypergraph_source == 'official_adaptive'
-            else None
-        )
+        self.hgc = hgypergraph_constructor(num_nodes,num_hyperedges, node_dim, device,scale_hyperedges = scale_hyperedges, alpha=tanhalpha,static_feat=static_feat,metric='knn')
 
 
 
@@ -316,21 +286,6 @@ class sthypergnn(nn.Module):
                     self.gconv2.append(mixprop(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
                     self.gconv3.append(mixprop(conv_channels, residual_channels, gcn_depth, dropout, propalpha))
 
-                time_width = (
-                    self.seq_length - rf_size_j + 1
-                    if self.seq_length > self.receptive_field
-                    else self.receptive_field - rf_size_j + 1
-                )
-                if self.hgcn_true:
-                    if self.adaptive_hyperhgnn == 'hgcn':
-                        self.hypergraph_layers.append(HypergraphConvolution(time_width, time_width))
-                    elif self.adaptive_hyperhgnn == 'hgat':
-                        self.hypergraph_layers.append(HypergraphAttention(time_width, time_width))
-                    elif self.adaptive_hyperhgnn == 'hsage':
-                        self.hypergraph_layers.append(HypergraphSAGE(time_width, time_width))
-                    else:
-                        raise ValueError(f'Unknown hypergraph operator: {self.adaptive_hyperhgnn}')
-
                 
 
 
@@ -361,12 +316,12 @@ class sthypergnn(nn.Module):
             self.skipE = nn.Conv2d(in_channels=residual_channels, out_channels=skip_channels, kernel_size=(1, 1), bias=True)
         
 
-        self.register_buffer('idx', torch.arange(self.num_nodes))
+        self.idx = torch.arange(self.num_nodes)
         self.device = device
 
 
 
-    def forward(self, input, idx=None, incidence_override=None, return_features=False):
+    def forward(self, input, idx=None):
         seq_len = input.size(3)
         
         assert seq_len==self.seq_length, 'input sequence length not equal to preset sequence length'
@@ -383,43 +338,21 @@ class sthypergnn(nn.Module):
                 else:
                     adp = self.gc(idx)
             else:
-                adp = self.predefined_A.to(device=input.device, dtype=input.dtype)
-            adp = adp.to(dtype=input.dtype)
+                adp = self.predefined_A.requires_grad_(True)
+            adp = adp.to(torch.float32)
 
         # High-oder interaction 
         if self.hgcn_true:
-            if incidence_override is not None:
-                hadp = incidence_override
-            elif self.hypergraph_source == 'fixed_topology':
-                hadp = (
-                    self.fixed_incidence_norm
-                    if self.adaptive_hyperhgnn == 'hgcn'
-                    else self.fixed_incidence
-                )
-            elif self.buildH_true:
+            if self.buildH_true:
                 if idx is None: 
                     hadp = self.hgc(self.idx)
                 else:
                     hadp = self.hgc(idx)
             else:
-                hadp = self.predefined_H.to(device=input.device, dtype=input.dtype)
+                hadp = self.predefined_H.requires_grad(True)
         
         
-            hadp = hadp.to(device=input.device, dtype=input.dtype)
-            if hadp.ndim not in (2, 3):
-                raise ValueError(
-                    'incidence_override must have shape [nodes,edges] '
-                    'or [batch,nodes,edges]'
-                )
-            if hadp.shape[-2] != self.num_nodes:
-                raise ValueError(
-                    f'incidence has {hadp.shape[-2]} nodes, expected {self.num_nodes}'
-                )
-            if hadp.ndim == 3 and hadp.shape[0] != input.shape[0]:
-                raise ValueError(
-                    f'incidence batch {hadp.shape[0]} does not match input batch '
-                    f'{input.shape[0]}'
-                )
+            hadp = hadp.to(torch.float32)
 
 
         x = self.start_conv(input)
@@ -439,11 +372,11 @@ class sthypergnn(nn.Module):
                 gate = torch.sigmoid(gate)
 
                 x = filter * gate
-                x = F.dropout(x, self.dropout, training=self.training)
+                x = F.dropout(x, self.dropout, training=self.training).to(torch.float32)
             else:
                 x = self.filter_convs[i](x)
 
-            s = x
+            s = x.to(torch.float32)
             s = self.skip_convs[i](s)
             skip = s + skip
             
@@ -465,10 +398,19 @@ class sthypergnn(nn.Module):
             # HGCN Module
             b,l,f,n = x.shape
             if self.hgcn_true: 
-                x2 = self.hypergraph_layers[i](x, hadp)
+                if self.adaptive_hyperhgnn == 'hgcn':
+                    hypergraph_convlayer = HypergraphConvolution(in_channels=n, out_channels=n)
+                    x2 =  hypergraph_convlayer(x, hadp)     
+                elif self.adaptive_hyperhgnn == 'hgat':     
+                    hypergraph_gatlayer = HypergraphAttention(in_channels=n, out_channels=n)
+                    x2 = hypergraph_gatlayer(x, hadp)    
+                elif self.adaptive_hyperhgnn == 'hsage':                
+                    hypergraph_sagelayer = HypergraphSAGE(in_channels=n, out_channels=n)
+                    x2  = hypergraph_sagelayer(x, hadp)
+                else:
+                    x2 = self.residual_convs[i](x)
 
-                graph_mix = torch.sigmoid(self.gamma_logit).to(dtype=x1.dtype)
-                x = graph_mix * x1 + (1 - graph_mix) * x2.to(x1.device)
+                x = self.gamma* x1 +  (1 - self.gamma)* x2.to(x1.device) 
             else:
                 x = x1
 
@@ -482,11 +424,10 @@ class sthypergnn(nn.Module):
         skip = self.skipE(x) + skip
         x = F.relu(skip)
         x = F.relu(self.end_conv_1(x))
-        short_hidden = x.squeeze(-1).transpose(1, 2) if return_features else None
         x = self.end_conv_2(x)        
 
 
-        return (x, short_hidden) if return_features else x
+        return x
 
 
 

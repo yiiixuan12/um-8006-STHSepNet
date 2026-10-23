@@ -11,7 +11,19 @@ scipy==1.10.1
 sentencepiece==0.2.0
 tensorboardX==2.6.2.2
 transformers==4.44.2
+pytest>=7.4.0,<9.0
+tokenizers==0.19.1
+sentencepiece==0.2.0
+huggingface_hub==0.24.6
+safetensors==0.4.3
+filelock==3.13.1
+matplotlib==3.7.5
+tensorboardX==2.6.2.2
+tqdm>=4.66.1
 
 # Windows note: the source build of PyMetis needs MSVC.  The validated pilot
 # environment uses the prebuilt conda-forge packages instead:
 #   conda install -c conda-forge pymetis=2025.2.2 metis
+
+
+
