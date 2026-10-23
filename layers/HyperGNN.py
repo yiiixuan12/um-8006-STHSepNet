@@ -5,6 +5,47 @@ import torch.nn.functional as F
 from torch.nn.parameter import Parameter
 
 
+def _prepare_incidence(x, H):
+    """Validate and align a static [N,E] or batched [B,N,E] incidence."""
+    if H.ndim not in (2, 3):
+        raise ValueError("H must have shape [nodes,edges] or [batch,nodes,edges]")
+    if H.shape[-2] != x.shape[-2]:
+        raise ValueError(
+            f"H has {H.shape[-2]} nodes but x has {x.shape[-2]}"
+        )
+    if H.ndim == 3 and H.shape[0] != x.shape[0]:
+        raise ValueError(
+            f"batched H has batch {H.shape[0]} but x has batch {x.shape[0]}"
+        )
+    return H.to(device=x.device, dtype=x.dtype)
+
+
+def _node_to_hyperedge(H, x):
+    if H.ndim == 2:
+        return torch.einsum("ne,blnf->blef", H, x)
+    return torch.einsum("bne,blnf->blef", H, x)
+
+
+def _hyperedge_to_node(H, x):
+    if H.ndim == 2:
+        return torch.einsum("ne,blef->blnf", H, x)
+    return torch.einsum("bne,blef->blnf", H, x)
+
+
+def _edge_degree_view(H):
+    degree = H.sum(dim=-2)
+    if H.ndim == 2:
+        return degree.view(1, 1, -1, 1)
+    return degree.unsqueeze(1).unsqueeze(-1)
+
+
+def _node_degree_view(H):
+    degree = H.sum(dim=-1)
+    if H.ndim == 2:
+        return degree.view(1, 1, -1, 1)
+    return degree.unsqueeze(1).unsqueeze(-1)
+
+
 
 class HypergraphConvolution(nn.Module):
     def __init__(self, in_channels, out_channels ):
@@ -12,8 +53,8 @@ class HypergraphConvolution(nn.Module):
         self.in_channels = in_channels
         self.out_channels = out_channels
 
-        self.W = nn.Parameter(torch.Tensor(in_channels, out_channels).to(torch.float32))
-        self.U = nn.Parameter(torch.Tensor(out_channels, out_channels).to(torch.float32))
+        self.W = nn.Parameter(torch.empty(in_channels, out_channels))
+        self.U = nn.Parameter(torch.empty(out_channels, out_channels))
         self.reset_parameters()
 
     
@@ -26,16 +67,16 @@ class HypergraphConvolution(nn.Module):
         :param: x: BLFN   bffloat16
         :param: H: hypergraph matrix shape (n,m)  bffloat16
         '''
-        device = self.W.device  # avoid calculating at two device 
+        device = self.W.device  # avoid calculating at two device
         x = x.to(device)
-        H = H.to(device)
+        H = _prepare_incidence(x, H)
         # Node to hyperedge information aggregation 
         x_enc = torch.matmul(x, self.W)  # (B, L, N, F) ->(B, L, N, F)
-        x_enc = torch.einsum('nm, blnf->blmf', H, x_enc)  # (N, M), (B, L, N, F') -> (B, L, M, F')
+        x_enc = _node_to_hyperedge(H, x_enc)
         # information transformation on hyperedges
         x_enc = F.relu(torch.matmul(x_enc,self.U))  # (B, L, M, F') -> (B, L, M, F')
         # Hyperedges to Node information aggregation
-        x_out = torch.einsum('mn,blmf->blnf',  H.t(), x_enc) #  (N, M), (B, L, M, F') -> (B, L, N, F')
+        x_out = _hyperedge_to_node(H, x_enc)
         return x_out
 
 
@@ -50,9 +91,9 @@ class HypergraphSAGE(nn.Module):
         self.dropout = nn.Dropout(dropout)
 
         # Initial Parameters
-        self.W_self = nn.Parameter(torch.Tensor(in_channels, out_channels).to(torch.float32))
-        self.W_neigh = nn.Parameter(torch.Tensor(in_channels, out_channels).to(torch.float32))
-        self.W_concat = nn.Parameter(torch.Tensor(2 * out_channels, out_channels).to(torch.float32))
+        self.W_self = nn.Parameter(torch.empty(in_channels, out_channels))
+        self.W_neigh = nn.Parameter(torch.empty(in_channels, out_channels))
+        self.W_concat = nn.Parameter(torch.empty(2 * out_channels, out_channels))
         self.reset_parameters()
 
 
@@ -70,24 +111,24 @@ class HypergraphSAGE(nn.Module):
         '''
         device = self.W_self.device
         x = x.to(device)
-        H = H.to(device)
+        H = _prepare_incidence(x, H)
 
         # node degree and hyperedges degree
-        hyperedge_degrees = H.sum(dim=0).to(torch.float32)  # (M,)
-        node_degrees = H.sum(dim=1).to(torch.float32)       # (N,)
+        hyperedge_degrees = _edge_degree_view(H)
+        node_degrees = _node_degree_view(H)
 
         
         # Node feature transformation
         x_self = torch.einsum('blnf, fd -> blnd', x, self.W_self)  # (B, L, N, F')
 
         # hyperedges feature aggregation: Node features in aggregate hyperedges (averaging pooling)
-        hyperedge_features = torch.einsum('mn, blnf -> blmf', H.t(), x)  # (B, L, M, F)
-        hyperedge_features = hyperedge_features / (hyperedge_degrees + 1).unsqueeze(-1).unsqueeze(0).unsqueeze(0)
+        hyperedge_features = _node_to_hyperedge(H, x)
+        hyperedge_features = hyperedge_features / (hyperedge_degrees + 1)
         hyperedge_features = self.relu(hyperedge_features)
 
         # Aggregate hyperedges features to nodes
-        x_neigh = torch.einsum('nm, blmf -> blnf', H, hyperedge_features)  # (B, L, N, F)
-        x_neigh = x_neigh / (node_degrees + 1).unsqueeze(-1).unsqueeze(0).unsqueeze(0)
+        x_neigh = _hyperedge_to_node(H, hyperedge_features)
+        x_neigh = x_neigh / (node_degrees + 1)
         x_neigh = torch.einsum('blnf, fd -> blnd', x_neigh, self.W_neigh)  # (B, L, N, F')
         
         # ==== 4. 特征拼接与融合 ====
@@ -107,10 +148,10 @@ class HypergraphAttention(nn.Module):
         self.dropout = dropout
 
         # 初始化参数
-        self.W_self = nn.Parameter(torch.Tensor(in_channels, out_channels).to(torch.float32))
-        self.W_neigh = nn.Parameter(torch.Tensor(in_channels, out_channels).to(torch.float32))
-        self.W_concat = nn.Parameter(torch.Tensor(2 * out_channels, out_channels).to(torch.float32))
-        self.attention = nn.Parameter(torch.Tensor(2 * out_channels, 1).to(torch.float32))
+        self.W_self = nn.Parameter(torch.empty(in_channels, out_channels))
+        self.W_neigh = nn.Parameter(torch.empty(in_channels, out_channels))
+        self.W_concat = nn.Parameter(torch.empty(2 * out_channels, out_channels))
+        self.attention = nn.Parameter(torch.empty(2 * out_channels, 1))
 
         # 初始化权重
         nn.init.xavier_uniform_(self.W_self)
@@ -131,19 +172,19 @@ class HypergraphAttention(nn.Module):
         """
         device = self.W_self.device
         x = x.to(device)
-        H = H.to(device)
+        H = _prepare_incidence(x, H)
 
         # 节点特征转换
         x_self = torch.einsum('blnf, fd -> blnd', x, self.W_self)  # (B, L, N, F')
 
         # 超边特征聚合
-        hyperedge_features = torch.einsum('mn, blnf -> blmf', H.t(), x)  # (B, L, M, F)
-        hyperedge_features = hyperedge_features / (H.sum(dim=0) + 1).unsqueeze(-1).unsqueeze(0).unsqueeze(0)
+        hyperedge_features = _node_to_hyperedge(H, x)
+        hyperedge_features = hyperedge_features / (_edge_degree_view(H) + 1)
         hyperedge_features = self.leaky_relu(hyperedge_features)
 
         # 聚合超边特征到节点
-        x_neigh = torch.einsum('nm, blmf -> blnf', H, hyperedge_features)  # (B, L, N, F)
-        x_neigh = x_neigh / (H.sum(dim=1) + 1).unsqueeze(-1).unsqueeze(0).unsqueeze(0)
+        x_neigh = _hyperedge_to_node(H, hyperedge_features)
+        x_neigh = x_neigh / (_node_degree_view(H) + 1)
         x_neigh = torch.einsum('blnf, fd -> blnd', x_neigh, self.W_neigh)  # (B, L, N, F')
 
         # 特征拼接
