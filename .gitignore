@@ -21,4 +21,5 @@ dataset/**/*.csv
 checks/
 *.pem
 *.key
+experiments/registry.lock
 

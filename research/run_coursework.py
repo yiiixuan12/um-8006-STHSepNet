@@ -30,8 +30,9 @@ from research.coursework_data import SPECS, load_dataset, CourseworkWindows
 from research.run_periodic_bert_repair import training_loss, utility_training_loss
 from models.periodic_bert_v4 import PeriodicBertV4
 from models.periodic_tokens import periodic_numeric_features
+from research.experiment_registry import registered_run
 
-SOURCES=('research/run_coursework.py','research/coursework_data.py','research/coursework_config.json',
+SOURCES=('research/run_coursework.py','research/experiment_registry.py','research/coursework_data.py','research/coursework_config.json',
     'research/common.py','research/traffic_data.py','research/run_periodic_bert_repair.py',
     'models/ST_SepNet.py','models/periodic_bert_v4.py','models/periodic_tokens.py',
     'models/periodic_memory_policy.py','models/bert_backbone.py','models/spatial_context.py',
@@ -255,7 +256,17 @@ def run(args):
     config=json.loads((ROOT/'research/coursework_config.json').read_text())
     config.update(root_path=str(ROOT/'dataset'/spec['folder']),adjacency_path=spec['adj'],node_num=spec['nodes'],
         llm_path=str(args.bert_path.resolve()),min_values=bundle.train_min.tolist(),max_values=bundle.train_max.tolist(),
-        data={'pems03':'PEMS03','metr_la':'METR'}[args.dataset],d_ff=spec['d_ff'],enc_in=spec['nodes'])
+        data={'pems03':'PEMS03','metr_la':'METR','bj500':'BJ',
+              'bike_inflow':'inflow','bike_outflow':'outflow'}[args.dataset],
+        d_ff=spec['d_ff'],enc_in=spec['nodes'])
+    if spec['period'] != 288:
+        # Preserve the existing five-minute model and disclose hourly semantics.
+        config['prompt_domain']=1
+        config['content']=(f"{args.dataset} bicycle demand at {spec['nodes']} stations, "
+                           'sampled hourly. Timestamps are calendar features, not event labels.')
+    report['memory_sampling']={'steps_per_day':spec['period'],'memory_history_steps':2064,
+        'memory_lag_steps':288,'memory_lag_days':288/spec['period'],
+        'note':'Fixed-step adapter; hourly BIKE uses 12-day lags, not daily lags.'}
     report['base_model_config']=config; report['process_id']=os.getpid(); write_json(report_path,report)
     seed_all(args.seed); torch.set_num_threads(4)
     from models.ST_SepNet import Model
@@ -302,7 +313,7 @@ def run(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--dataset',choices=('pems03','metr_la'),required=True)
+    parser.add_argument('--dataset',choices=tuple(SPECS),required=True)
     parser.add_argument('--seed',type=int,required=True); parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--stage',choices=('baseline','improved','pair'),default='pair')
     parser.add_argument('--bert-path',type=Path,default=ROOT/'huggingface/google_bert')
@@ -311,7 +322,10 @@ def main():
     args=parser.parse_args()
     if args.batch_size<1 or args.target_chunk<1 or SPECS[args.dataset]['effective_batch']%args.batch_size:
         parser.error('batch must divide baseline effective batch; target chunk must be positive')
-    try: run(args)
+    hardware={'platform':sys.platform,'torch':torch.__version__,'cuda':torch.version.cuda,
+              'devices':[torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())]}
+    try:
+        registered_run(args,ROOT,SPECS[args.dataset],SOURCES,hardware,run)
     except Exception:
         if args.output.exists(): write_json(args.output/'failure.json',{'traceback':traceback.format_exc()})
         raise

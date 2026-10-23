@@ -8,9 +8,28 @@ from research.coursework_data import CourseworkWindows,origins_for,load_dataset
 from research.run_coursework import solve_moments,compact_state,load_compact,sliced_adapter_batch
 from research.summarize_coursework import summarize
 import json
+from unittest.mock import patch
+import pandas as pd
+from research.traffic_data import load_pems03
 
 
 class CourseworkTests(unittest.TestCase):
+    def test_timestamp_resolution_is_explicitly_nanoseconds(self):
+        with TemporaryDirectory() as directory:
+            path=Path(directory)/'hourly.csv'
+            pd.DataFrame({'date':pd.date_range('2023-01-01',periods=20,freq='h'),
+                          'node':np.arange(20)}).to_csv(path,index=False)
+            parse=pd.to_datetime
+            def microsecond_parse(*args,**kwargs):
+                values=parse(*args,**kwargs)
+                if not hasattr(values.dt,'as_unit'):
+                    self.skipTest('microsecond pandas datetime requires pandas 2+')
+                return values.dt.as_unit('us')
+            with patch('research.traffic_data.pd.to_datetime',side_effect=microsecond_parse):
+                bundle=load_pems03(path,.7,.1)
+            np.testing.assert_array_equal(np.diff(bundle.timestamps_ns),
+                                          np.full(19,3600_000_000_000,dtype=np.int64))
+
     def bundle(self):
         raw=np.arange(4000*3,dtype=np.float32).reshape(4000,3)
         return SimpleNamespace(normalized=raw,marks=np.zeros((4000,5),np.float32),std=np.ones(3,np.float32),
@@ -71,7 +90,7 @@ class CourseworkTests(unittest.TestCase):
                 'epochs':3,'best_epoch':2,'stop_reason':'epoch_cap'}}}
             (path/'report.json').write_text(json.dumps(report),encoding='utf-8')
             result=summarize(root)
-            self.assertEqual(result['status'],'incomplete'); self.assertEqual(len(result['missing']),11)
+            self.assertEqual(result['status'],'incomplete'); self.assertEqual(len(result['missing']),29)
             self.assertEqual(result['summary'][0]['mae'],{'mean':20.,'sample_std':None})
 
 
