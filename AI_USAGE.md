@@ -200,3 +200,50 @@ All evidence paths are relative to this repository root.
   comparison information-matched.
 - All seven agent logs are under `logs/agents/`; the decisions and human verifications
   above are the authoritative record and were not delegated to any agent.
+
+## H1 publication update — 2026-10-26 — yixuan wang
+
+- **Tool:** OpenAI Codex; this publication entry does not assert an unverified model/version or human approval.
+- **User-authorized task:** publish only H1 code and completed experiment evidence, update H1 instructions, and identify H1 owner yixuan wang / KAN owner jinfeng guo. Preserve the team's KAN code and results.
+- **Agent assistance:** packaged existing five-dataset and BIKE validation results; added a portable H1 training/evaluation interface and CPU-only plotting/result checks; isolated the frozen H1 baseline/operators under `models/sthsepnet_h1.py` and `layers/h1/` to avoid overwriting KAN.
+- **Verification scope:** targeted interface/information-control tests, a real CUDA weights-loading and raw-flow export smoke check, result/report numerical checks, and one focused checkpoint/resume review. These are release checks, not new accuracy experiments or a full-repository certification.
+- **Evidence:** `research/run_h1.py`, `tests/test_h1_release.py`, `tests/test_bike_validation.py`, `experiments/h1/provenance.json`, and the published per-run reports.
+- **Claim boundaries retained:** one frozen city baseline with three adapter seeds in the main/ablation cohorts; five-epoch budget caps; longer inputs; METR-LA RMSE/MSE deterioration; unstable independent utility-supervision benefit. No claim of language-pretraining superiority.
+- **Sanitization and review status:** machine-local paths/PIDs were removed from published reports without changing scientific values. Original experiments were not modified or rerun. The team remains responsible for reviewing the submission; this entry does not fabricate human verification.
+
+
+# AI_USAGE — Jinqi Consequential-Interaction Ledger
+
+Records consequential agent assistance for Jinqi's dataset adaptation, experiment tracking, debugging, and result summaries. This ledger is separate from the KAN ledger in `AI_USAGE.md`.
+
+Reconstructed on 2026-10-23 from the conversation history; the earlier ledger and logs were unavailable in the inspected repository versions. Dates identify the recorded work episodes, not recovered transcript timestamps. Historical model versions and sampling settings were not retained and are marked unknown. Evidence paths are relative to the repository root.
+
+## Ledger
+
+### AI-JINQI-001 — 2026-10-21 — Jinqi
+- **Stage:** Implementation / testing / debugging / experiment execution support
+- **Tool / model / version:** OpenAI Codex; historical model/version unknown; sampling settings not exposed.
+- **Delegated task:** Preserve the baseline/improved command interface, adapt available datasets, automatically register experiments, and fix data-loading problems.
+- **Summary (sanitized):** Extended dataset configuration for PEMS03, METR-LA, BJ500, BIKE-Inflow and BIKE-Outflow; added end-of-invocation experiment registration and provenance snapshots; normalized timestamp conversion to nanoseconds. Prepared a BJ500/METR-LA baseline queue for seeds 2021–2023. Kept BIKE-specific training settings and documented the hourly interpretation of the memory interval.
+- **Decision: Modified.** Accepted dataset adaptation and tracking. At the user's request, removed started records: only completed, failed or caught interrupted outcomes are registered. Kept weights in the requested output directory. Smoke results are process checks, not accuracy evidence; no historical experiments are fabricated.
+- **Human verification:** The user confirmed on 2026-10-23 that code and experiments had been manually reviewed and experiments passed. This records that confirmation; it does not assert that the subsequently merged code was revalidated.
+- **Evidence:**
+  - Code: [training entry](research/run_coursework.py), [registry](research/experiment_registry.py), [dataset adapter](research/coursework_data.py), [timestamp handling](research/traffic_data.py)
+  - Tests: [registry tests](tests/test_experiment_registry.py), [coursework tests](tests/test_coursework.py)
+  - Agent log: [2026-10-21-registry-datasets](logs/agents/2026-10-21-registry-datasets.md)
+- **Sanitization:** Local absolute paths omitted; no credentials or raw transcripts included.
+
+### AI-JINQI-002 — 2026-10-23 — Jinqi
+- **Stage:** Implementation / testing / result aggregation
+- **Tool / model / version:** OpenAI Codex; historical model/version unknown; sampling settings not exposed.
+- **Delegated task:** Extend the coursework summarizer to all five supported dataset tasks and update the agent log and AI usage record.
+- **Summary (sanitized):** Expanded default dataset coverage; added dataset/stage selection, including baseline-only summaries; retained per-seed records and mean/sample-standard-deviation summaries; checked missing runs and excluded smoke or mismatched reports from accuracy aggregation.
+- **Decision: Accepted.** Missing runs remain missing rather than becoming zero-valued measurements; a single run does not establish across-seed variability. Aggregation does not launch training.
+- **Human verification:** The user confirmed that manual code review and review of test results passed. The historical session recorded 11 relevant tests passing and a baseline aggregation of eight available runs with seven missing combinations. These are historical checks, not a fresh post-merge test run.
+- **Evidence:**
+  - Code: [summarizer](research/summarize_coursework.py)
+  - Tests: [summarizer tests](tests/test_summarize_coursework.py), [coursework tests](tests/test_coursework.py)
+  - Agent log: [2026-10-23-summary-all-datasets](logs/agents/2026-10-23-summary-all-datasets.md)
+- **Sanitization:** Local absolute paths omitted; no credentials or raw transcripts included.
+
+This ledger documents the available Jinqi episodes only. It does not claim that these two entries alone cover every course-required phase or constitute a completed adversarial-review episode.

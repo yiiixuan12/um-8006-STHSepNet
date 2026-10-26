@@ -21,7 +21,7 @@
 
 ## 决定: Modified
 
-接受数据适配和自动登记；按用户要求移除 started，只在调用结束时登记 completed、failed 或 interrupted。续训使用新 run_id；强制结束或断电无法保证写入。权重保留在 --output 指定目录，配置与报告副本保存在 experiments/runs/<run_id>/。费用 not separately metered 表示未单独计量，不能解释为零成本。
+接受数据适配和自动登记；按用户要求移除 started，只在调用结束时登记 completed、failed 或 interrupted。续训使用新 run_id；强制结束或断电无法保证写入。权重保留在 --output 指定目录。费用 not separately metered 表示未单独计量，不能解释为零成本。
 
 BIKE 保持 50 轮上限、学习率 0.0001、有效 batch 16、d_ff 32；其他数据集为 30 轮、0.0003、32、128。保留改进适配器的 2064 步历史和 288 步间隔；BIKE 的 288 小时为 12 天，48 步预测为 48 小时，不声称已完成小时数据的周期设计。smoke=true 仅验证流程，不作精度证据。
 
