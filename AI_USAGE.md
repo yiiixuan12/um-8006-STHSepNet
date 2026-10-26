@@ -1,16 +1,21 @@
 # AI_USAGE — Consequential-Interaction Ledger
 
-This file records every **consequential** coding-agent interaction performed for the
-STH-SepNet improvement. A consequence is an interaction that changed,
+This file records disclosed **consequential** coding-agent assistance for the
+STH-SepNet coursework. A consequence is an interaction that changed,
 or could reasonably change, a claim, the code, a config, data processing, a metric,
 a result, or a project decision. Routine autocomplete / spelling / low-stakes
 formatting is not logged.
 
-**Course rules (binding):**
-- Every agent-assisted claim below was **verified by a human/team member** before
-  acceptance; nothing is accepted on the agent's authority.
-- Raw transcripts are not published; each entry links a sanitized agent log under
-  `logs/agents/` plus the concrete code/config/result artifacts that back the claim.
+**Responsibility and disclosure:**
+- The team is responsible for reviewing and accepting the submission. An agent-run
+  code/result check is not human verification; the H1 entries below explicitly
+  distinguish recorded decisions, artifact checks and claims not established.
+- The pre-existing AI-KAN-001 through AI-KAN-007 entries, including their historical
+  human-verification statements, are retained as supplied. This H1 update does not
+  independently re-audit those KAN statements or their historical evidence paths.
+- Raw transcripts are not published. H1 entries link a sanitized retrospective
+  discussion summary under `logs/agents/` and concrete repository artifacts. The
+  summary is not a verbatim transcript or an exhaustive event-by-event record.
 - No credentials, personal data, or restricted material appear in this file or its
   logs.
 
@@ -186,7 +191,7 @@ All evidence paths are relative to this repository root.
 
 ---
 
-## Cross-cutting summary
+## KAN cross-cutting summary (historical scope: AI-KAN-001–007 only)
 
 - **Three required phases covered:** paper understanding/reproduction planning
   (AI-KAN-001, 002), implementation/testing/execution (AI-KAN-003, 004),
@@ -195,18 +200,145 @@ All evidence paths are relative to this repository root.
   adversarial reviews. In AI-KAN-006 the agent's proposal ("enable `update_grid`, push
   KAN as main improvement") was **rejected on verified grounds**, and the over-claim
   "KAN fully better" (AI-KAN-005) was reframed as a metric-dependent mixed result.
-- **Uniform guardrail across all entries:** `update_grid=False` and no extra history
+- **Uniform H3 guardrail across these seven KAN entries:** `update_grid=False` and no extra history
   input were held constant; only the prediction head changes for H3, keeping the
   comparison information-matched.
 - All seven agent logs are under `logs/agents/`; the decisions and human verifications
   above are the authoritative record and were not delegated to any agent.
 
-## H1 publication update — 2026-10-26 — yixuan wang
+## H1 ledger — yixuan wang
 
-- **Tool:** OpenAI Codex; this publication entry does not assert an unverified model/version or human approval.
-- **User-authorized task:** publish only H1 code and completed experiment evidence, update H1 instructions, and identify H1 owner yixuan wang / KAN owner jinfeng guo. Preserve the team's KAN code and results.
-- **Agent assistance:** packaged existing five-dataset and BIKE validation results; added a portable H1 training/evaluation interface and CPU-only plotting/result checks; isolated the frozen H1 baseline/operators under `models/sthsepnet_h1.py` and `layers/h1/` to avoid overwriting KAN.
-- **Verification scope:** targeted interface/information-control tests, a real CUDA weights-loading and raw-flow export smoke check, result/report numerical checks, and one focused checkpoint/resume review. These are release checks, not new accuracy experiments or a full-repository certification.
-- **Evidence:** `research/run_h1.py`, `tests/test_h1_release.py`, `tests/test_bike_validation.py`, `experiments/h1/provenance.json`, and the published per-run reports.
-- **Claim boundaries retained:** one frozen city baseline with three adapter seeds in the main/ablation cohorts; five-epoch budget caps; longer inputs; METR-LA RMSE/MSE deterioration; unstable independent utility-supervision benefit. No claim of language-pretraining superiority.
-- **Sanitization and review status:** machine-local paths/PIDs were removed from published reports without changing scientific values. Original experiments were not modified or rerun. The team remains responsible for reviewing the submission; this entry does not fabricate human verification.
+Tool for the entries below: **OpenAI Codex**. Exact historical model identifiers and
+sampling settings are not asserted where they are not recoverable. Entries were
+summarized on 2026-10-26 from the recorded dialogue and published artifacts. Dates
+refer to recorded discussion/execution periods, not invented dates for earlier work.
+
+### AI-H1-001 — Undated earlier dialogue — hypothesis selection
+
+- **Task:** investigate how a pretrained temporal backbone could use node-specific
+  long-term and spatial information instead of only a global average.
+- **Decision:** narrow H1 to node-level multi-period memory and utility-supervised
+  historical retrieval. Drop the proposed neighboring-road third contribution from
+  the final study; do not claim that BERT pretraining or human-like spatial
+  understanding has been demonstrated.
+- **Evidence:** [discussion summary](logs/agents/h1_discussion_summary.md#1-hypotheses-and-scope),
+  [model](models/periodic_bert_fast.py), [published scope](experiments/h1/README.md).
+- **Verification boundary:** design rationale is not evidence that each component
+  improves accuracy. Earlier exploratory routes are not presented as completed
+  successful innovations or assigned reconstructed dates.
+
+### AI-H1-002 — Undated earlier dialogue — diagnose the long-term route
+
+- **Task:** analyze weak gains, short-term bypass, ineffective historical selection
+  and unstable pretrained-versus-random comparisons.
+- **Decision:** retain a numeric periodic reference route; let the neural route
+  refine forecasts using current and historical context. Use prediction-value
+  supervision for historical selection and retain the option to abstain. Do not
+  attribute the complete method's gain solely to BERT or token design.
+- **Evidence:** [discussion summary](logs/agents/h1_discussion_summary.md#2-diagnosis-and-the-retained-method),
+  [periodic model](models/periodic_bert_v4.py),
+  [memory policy](models/periodic_memory_policy.py),
+  [training functions](research/run_coursework.py).
+- **Verification boundary:** these are consequential implementation/design
+  choices; the final ablations, not the motivation alone, determine independent
+  support. No stable language-pretraining advantage is claimed.
+
+### AI-H1-003 — 2026-10-20–23 — practical protocol and runtime decisions
+
+- **Task:** complete feasible multi-dataset experiments under the assignment
+  deadline without silently discarding seeds, nodes or data.
+- **Decision:** final main scope is five datasets, three adapter seeds per dataset,
+  one shared frozen baseline per city and a five-total-epoch adapter cap. Select
+  best weights by validation raw MSE. Keep longer-input and hourly-BIKE differences
+  explicit. Distinguish an authorized fast **architecture change** from later
+  **equivalent execution optimizations**.
+- **Evidence:** [discussion summary](logs/agents/h1_discussion_summary.md#3-final-protocol-and-efficiency),
+  [portable entry](research/run_h1.py),
+  [hourly model](models/periodic_hourly.py),
+  [execution layer](research/fast_execution.py),
+  [per-seed records](experiments/h1/main/per_seed.csv).
+- **Verification boundary:** equal-output execution checks do not prove that the
+  earlier fast architecture is mathematically identical to the slow model.
+  Five-epoch caps are budget stops, not confirmed convergence; three adapter seeds
+  do not mean three independent end-to-end baseline trainings.
+
+### AI-H1-004 — 2026-10-23–24 — main results and adverse findings
+
+- **Task:** aggregate the completed five-dataset matrix and explain why lower MAE
+  need not imply lower squared error.
+- **Decision:** preserve all results, including METR-LA's improved mean MAE but
+  worse RMSE/MSE. Report corrected local baselines rather than call them the
+  original paper's numbers. Do not select favorable seeds or change the frozen
+  model in response to test-set outcomes.
+- **Evidence:** [discussion summary](logs/agents/h1_discussion_summary.md#4-main-results-and-interpretation),
+  [main table](experiments/h1/main/table.md),
+  [main reports](experiments/h1/main/reports),
+  [metric checker](research/check_h1_results.py).
+- **Verification boundary:** published window-error arithmetic can be independently
+  recomputed; it is not new model inference or proof that BERT caused the gain.
+  Higher squared error is consistent with larger tail mistakes but does not by
+  itself identify their causal mechanism.
+
+### AI-H1-005 — 2026-10-24 — independent paired 24-hour cases
+
+- **Task:** show restored hourly flow against ground truth using three baseline
+  seeds and three paired full-method seeds, and investigate overprediction/smoothing.
+- **Decision:** use predeclared dates/stations and the first 24 hours of a direct
+  48-hour forecast. Preserve raw-unit negative/overestimated outputs without
+  cosmetic clipping or smoothing. Keep the independent paired-case cohort separate
+  from shared-backbone ablations; do not start proposed repair experiments.
+- **Evidence:** [discussion summary](logs/agents/h1_discussion_summary.md#5-raw-flow-cases-and-bias-diagnosis),
+  [case restoration report](experiments/h1/cases/report.json),
+  [original-unit values](experiments/h1/cases/paired_24h_curves.csv),
+  [case figure](experiments/h1/cases/paired_24h_case_2.png).
+- **Verification boundary:** recorded diagnostics did not support an inverse-scaling
+  or time-alignment error as the main explanation for the displayed gaps. Incorrect
+  retrieval additions, coarse periodic representation and inherited baseline bias
+  remain plausible explanations, not experimentally isolated causal findings.
+  A few cases do not substitute for full-test evaluation.
+
+### AI-H1-006 — 2026-10-24–26 — ablations and rejected overclaim
+
+- **Task:** test the two proposed mechanisms with three seeds and summarize them
+  using a bar chart rather than only forecast curves.
+- **Decision:** compare full H1 against global-mean older history and removal of
+  auxiliary utility supervision, keeping retrieval itself in the latter. Report
+  mean MAE 4.4859 / 4.8124 / 4.5014, respectively. Reject the statement that both
+  innovations are independently and significantly established: utility supervision
+  has only a small mean gain and seed 2023 reverses direction on all three metrics.
+- **Evidence:** [discussion summary](logs/agents/h1_discussion_summary.md#6-ablations-and-claim-revision),
+  [ablation table](experiments/h1/ablation/table.md),
+  [per-seed results](experiments/h1/ablation/per_seed.csv),
+  [bar chart](experiments/h1/ablation/ablation_bars.png),
+  [control implementation](research/bike_validation_support.py).
+- **Verification boundary:** older node-specific history has consistent support in
+  this BIKE-Inflow comparison. The control does not separately isolate all token
+  scales, numeric calibration and neural encoding. Error bars are sample standard
+  deviations, not confidence intervals or significance tests.
+
+### AI-H1-007 — 2026-10-26 — publication and report reconciliation
+
+- **Task:** publish only H1 code/results, add portable instructions and reconcile
+  the report and this disclosure with the final evidence; preserve the other
+  contributors' work. H1 owner is **yixuan wang**; KAN owner is **jinfeng guo**.
+- **Decision:** isolate H1's frozen baseline/operators and publish compact results,
+  original-unit case values and figures. Do not publish datasets, BERT or large
+  checkpoints as though they were included. Replace early H1 pilot statements
+  with the completed main/ablation evidence and disclose the longer input budget.
+- **Evidence:** [discussion summary](logs/agents/h1_discussion_summary.md#7-release-and-submission),
+  [portable entry](research/run_h1.py),
+  [release tests](tests/test_h1_release.py),
+  [publication provenance](experiments/h1/provenance.json),
+  [published result guide](experiments/h1/README.md),
+  [updated team report](report/final_report.docx).
+- **Verification boundary:** the recorded release checks comprise 13 targeted
+  checks, a real CUDA loading/raw-flow smoke check, 78 metric recomputations and
+  one focused checkpoint/resume review. They are agent-executed release checks,
+  not human approval, new accuracy training or full-repository certification.
+  This disclosure update does not re-audit KAN. Machine-local paths/process IDs
+  were sanitized without changing scientific values; original experiments remain
+  unchanged. The team must review the final submission.
+  The report update was rendered and all 13 pages were visually checked; the
+  existing H3 result paragraphs and both numeric tables were checked for content
+  preservation. These document checks did not rerun training or certify the
+  teammate's scientific claims.
