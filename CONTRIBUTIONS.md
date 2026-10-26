@@ -9,8 +9,8 @@ freeze with the real member names and their commits.
 | Member | Role / responsibilities | Evidence (commits, logs, experiments) |
 |---|---|---|
 | {Member A} | Reproduction lead; data pipeline; baseline MLP runs | commits; `results/logs/baseline_s*.txt` |
-| {Member B} | KAN head implementation; dtype/`layers` fixes; tests | commits touching `src/kan/`, `src/models/ST_SepNet.py`, `tests/` |
-| {Member C} | Improvement design + full evaluation; report/presentation | commits; `results/logs/kan_s*.txt`; `report/`, `presentation/` |
+| jinfeng guo | H3: KAN prediction head and independent BIKE-Inflow evaluation | Existing `src/kan/`, `src/models/ST_SepNet.py`, KAN tests and reports |
+| yixuan wang | H1: node-level multi-period memory, utility-supervised retrieval, five-dataset evaluation, BIKE ablations and 24-hour cases | `research/run_h1.py`, `models/periodic_bert_fast.py`, `models/sthsepnet_h1.py`, `layers/h1/`, `experiments/h1/` |
 | {Member D} | Static/adaptive branch audit; experiment registry; AI_USAGE | `tests/test_static_adaptive.py`, `experiments/` |
 
 ## Contribution evidence checklist

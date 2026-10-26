@@ -1,0 +1,61 @@
+{
+  "status": "completed_three_paired_seeds",
+  "seeds": [
+    2021,
+    2022,
+    2023
+  ],
+  "case_selection": {
+    "origins": [
+      7032,
+      7872,
+      8736
+    ],
+    "nodes": [
+      245,
+      252,
+      191
+    ],
+    "station_names": [
+      "245",
+      "252",
+      "191"
+    ],
+    "station_train_means": [
+      0.44860117111255693,
+      4.912491867273911,
+      14.839785296031229
+    ],
+    "selection": "first/middle/last eligible test midnight; train-only station mean quartiles25/50/75",
+    "no_prediction_or_test_flow_used_for_selection": true,
+    "forecast_hours_exported": 24,
+    "model_output_hours": 48,
+    "forecast_type": "single-origin direct48h; report first24h, no rolling observations",
+    "interval_minutes": 60,
+    "unit": "original BIKE-Inflow hourly station inflow units",
+    "timestamps": [
+      "2023-10-21T00:00:00.000000000",
+      "2023-11-25T00:00:00.000000000",
+      "2023-12-31T00:00:00.000000000"
+    ]
+  },
+  "figures": [
+    "source://results_coursework/bike_validation_v1/cases/paired_24h_case_1.png",
+    "source://results_coursework/bike_validation_v1/cases/paired_24h_case_2.png",
+    "source://results_coursework/bike_validation_v1/cases/paired_24h_case_3.png"
+  ],
+  "arrays": "source://results_coursework/bike_validation_v1/cases/paired_24h_predictions.npz",
+  "csv": "source://results_coursework/bike_validation_v1/cases/paired_24h_curves.csv",
+  "baseline_seeds_independently_trained": true,
+  "baseline_history_hours": 48,
+  "improved_history_hours": 240,
+  "prediction_target_passed_to_model": false,
+  "inverse_normalization": "prediction * train_node_std + train_node_mean; internal RevIN already reversed",
+  "postprocessing": "none; no clipping, smoothing or rounding",
+  "case_is_not_a_substitute_for_full_test_evaluation": true,
+  "ablation_figures": [
+    "source://results_coursework/bike_validation_v1/cases/ablation_24h_case_1.png",
+    "source://results_coursework/bike_validation_v1/cases/ablation_24h_case_2.png",
+    "source://results_coursework/bike_validation_v1/cases/ablation_24h_case_3.png"
+  ]
+}

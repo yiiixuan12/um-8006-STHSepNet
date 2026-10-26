@@ -1,0 +1,34 @@
+{
+  "origins": [
+    7032,
+    7872,
+    8736
+  ],
+  "nodes": [
+    245,
+    252,
+    191
+  ],
+  "station_names": [
+    "245",
+    "252",
+    "191"
+  ],
+  "station_train_means": [
+    0.44860117111255693,
+    4.912491867273911,
+    14.839785296031229
+  ],
+  "selection": "first/middle/last eligible test midnight; train-only station mean quartiles25/50/75",
+  "no_prediction_or_test_flow_used_for_selection": true,
+  "forecast_hours_exported": 24,
+  "model_output_hours": 48,
+  "forecast_type": "single-origin direct48h; report first24h, no rolling observations",
+  "interval_minutes": 60,
+  "unit": "original BIKE-Inflow hourly station inflow units",
+  "timestamps": [
+    "2023-10-21T00:00:00.000000000",
+    "2023-11-25T00:00:00.000000000",
+    "2023-12-31T00:00:00.000000000"
+  ]
+}

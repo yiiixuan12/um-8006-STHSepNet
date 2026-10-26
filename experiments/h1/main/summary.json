@@ -1,0 +1,321 @@
+{
+  "status": "completed_15_adapter_runs",
+  "matrix_budget": {
+    "cohort": "fast_five_datasets_three_adapter_seeds_cap5_v1",
+    "adapter_max_epochs": 5,
+    "early_stop_patience": 5,
+    "baseline_seed": 2021,
+    "adapter_seeds": [
+      2021,
+      2022,
+      2023
+    ],
+    "full_data": true,
+    "shared_frozen_baseline": true,
+    "baseline_preparation_max_epochs": 20,
+    "seed_scope": "adapter initialization and training order; baseline shared within dataset",
+    "budget_note": "Epoch-cap termination is budget-limited, not confirmed convergence. Existing completed baselines keep their original training histories.",
+    "model_architecture": "fast_periodic_v1",
+    "bert_memory_tokens": 56,
+    "fine_candidate_count": 4,
+    "forecast_query_location": "32d readout outside BERT",
+    "original_slow_adapter_checkpoints_reused": false
+  },
+  "missing": [],
+  "per_seed": [
+    {
+      "dataset": "pems03",
+      "seed": 2021,
+      "epochs": 5,
+      "best_epoch": 3,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 18.241191395622607,
+      "rmse": 31.93289128081987,
+      "mse": 1019.7095455526617
+    },
+    {
+      "dataset": "pems03",
+      "seed": 2022,
+      "epochs": 5,
+      "best_epoch": 5,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 18.10898751536837,
+      "rmse": 31.901621017914913,
+      "mse": 1017.7134235706704
+    },
+    {
+      "dataset": "pems03",
+      "seed": 2023,
+      "epochs": 5,
+      "best_epoch": 5,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 18.312147360468625,
+      "rmse": 32.217286745014434,
+      "mse": 1037.9535652104828
+    },
+    {
+      "dataset": "metr_la",
+      "seed": 2021,
+      "epochs": 5,
+      "best_epoch": 5,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 8.796968303203792,
+      "rmse": 17.998327749856212,
+      "mse": 323.9398017912442
+    },
+    {
+      "dataset": "metr_la",
+      "seed": 2022,
+      "epochs": 5,
+      "best_epoch": 1,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 9.038360179845363,
+      "rmse": 17.87691789443926,
+      "mse": 319.5841934045226
+    },
+    {
+      "dataset": "metr_la",
+      "seed": 2023,
+      "epochs": 5,
+      "best_epoch": 3,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 8.965310894726692,
+      "rmse": 18.124145685034968,
+      "mse": 328.48465681237167
+    },
+    {
+      "dataset": "bj500",
+      "seed": 2021,
+      "epochs": 5,
+      "best_epoch": 5,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 5.2462790845050975,
+      "rmse": 9.730951978921025,
+      "mse": 94.691426416067
+    },
+    {
+      "dataset": "bj500",
+      "seed": 2022,
+      "epochs": 5,
+      "best_epoch": 5,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 5.213948865933818,
+      "rmse": 9.67062349772405,
+      "mse": 93.52095883473253
+    },
+    {
+      "dataset": "bj500",
+      "seed": 2023,
+      "epochs": 5,
+      "best_epoch": 3,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 5.252024014479683,
+      "rmse": 9.64643118116887,
+      "mse": 93.05363453302705
+    },
+    {
+      "dataset": "bike_inflow",
+      "seed": 2021,
+      "epochs": 5,
+      "best_epoch": 3,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 4.460623313558946,
+      "rmse": 12.451512887806132,
+      "mse": 155.04017319520221
+    },
+    {
+      "dataset": "bike_inflow",
+      "seed": 2022,
+      "epochs": 5,
+      "best_epoch": 3,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 4.452609120509023,
+      "rmse": 12.48973823189584,
+      "mse": 155.99356110128065
+    },
+    {
+      "dataset": "bike_inflow",
+      "seed": 2023,
+      "epochs": 5,
+      "best_epoch": 3,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 4.544476520952389,
+      "rmse": 12.747206029813018,
+      "mse": 162.49126156650138
+    },
+    {
+      "dataset": "bike_outflow",
+      "seed": 2021,
+      "epochs": 5,
+      "best_epoch": 2,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 4.512044738115104,
+      "rmse": 11.553259844275951,
+      "mse": 133.47781302935917
+    },
+    {
+      "dataset": "bike_outflow",
+      "seed": 2022,
+      "epochs": 5,
+      "best_epoch": 3,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 4.409771651886076,
+      "rmse": 11.399083067046679,
+      "mse": 129.9390947694303
+    },
+    {
+      "dataset": "bike_outflow",
+      "seed": 2023,
+      "epochs": 5,
+      "best_epoch": 4,
+      "stop_reason": "epoch_cap",
+      "convergence_confirmed": false,
+      "mae": 4.414052525853132,
+      "rmse": 11.628979043123037,
+      "mse": 135.2331535853948
+    }
+  ],
+  "aggregate": [
+    {
+      "dataset": "pems03",
+      "n_adapter_seeds": 3,
+      "mae": {
+        "mean": 18.22077542381987,
+        "sample_std": 0.10310717527785201
+      },
+      "rmse": {
+        "mean": 32.017266347916404,
+        "sample_std": 0.17392692941858076
+      },
+      "mse": {
+        "mean": 1025.125511444605,
+        "sample_std": 11.154162824118014
+      }
+    },
+    {
+      "dataset": "metr_la",
+      "n_adapter_seeds": 3,
+      "mae": {
+        "mean": 8.933546459258615,
+        "sample_std": 0.12379113073071482
+      },
+      "rmse": {
+        "mean": 17.999797109776814,
+        "sample_std": 0.12362044480845827
+      },
+      "mse": {
+        "mean": 324.0028840027128,
+        "sample_std": 4.450567013613881
+      }
+    },
+    {
+      "dataset": "bj500",
+      "n_adapter_seeds": 3,
+      "mae": {
+        "mean": 5.237417321639533,
+        "sample_std": 0.02052626037571235
+      },
+      "rmse": {
+        "mean": 9.68266888593798,
+        "sample_std": 0.04352883924576255
+      },
+      "mse": {
+        "mean": 93.75533992794219,
+        "sample_std": 0.8436773291244155
+      }
+    },
+    {
+      "dataset": "bike_inflow",
+      "n_adapter_seeds": 3,
+      "mae": {
+        "mean": 4.485902985006786,
+        "sample_std": 0.05088419359131582
+      },
+      "rmse": {
+        "mean": 12.56281904983833,
+        "sample_std": 0.16082354622639575
+      },
+      "mse": {
+        "mean": 157.8416652876614,
+        "sample_std": 4.054786836815961
+      }
+    },
+    {
+      "dataset": "bike_outflow",
+      "n_adapter_seeds": 3,
+      "mae": {
+        "mean": 4.445289638618104,
+        "sample_std": 0.05785122256375595
+      },
+      "rmse": {
+        "mean": 11.527107318148557,
+        "sample_std": 0.11715803822682619
+      },
+      "mse": {
+        "mean": 132.8833537947281,
+        "sample_std": 2.6966277130800718
+      }
+    }
+  ],
+  "fixed_baseline_references": [
+    {
+      "dataset": "pems03",
+      "seed": 2021,
+      "shared_not_three_independent_runs": true,
+      "source_report": "source://results_coursework/main_v1/pems03/seed_2021/report.json",
+      "mae": 21.619447328973653,
+      "rmse": 35.87440048538416,
+      "mse": 1286.9726101857311
+    },
+    {
+      "dataset": "metr_la",
+      "seed": 2021,
+      "shared_not_three_independent_runs": true,
+      "source_report": "source://results_coursework/main_v1/metr_la/seed_2021/report.json",
+      "mae": 10.359618257358505,
+      "rmse": 17.87229886194467,
+      "mse": 319.4190666106688
+    },
+    {
+      "dataset": "bj500",
+      "seed": 2021,
+      "shared_not_three_independent_runs": true,
+      "source_report": "source://results_coursework/fast_matrix_v1/frozen_baselines/bj500/seed_2021/report.json",
+      "mae": 6.090589279109086,
+      "rmse": 10.495417107081773,
+      "mse": 110.15378025162472
+    },
+    {
+      "dataset": "bike_inflow",
+      "seed": 2021,
+      "shared_not_three_independent_runs": true,
+      "source_report": "source://results_coursework/fast_matrix_v1/frozen_baselines/bike_inflow/seed_2021/report.json",
+      "mae": 5.434898075965359,
+      "rmse": 15.165553684629646,
+      "mse": 229.99401856138385
+    },
+    {
+      "dataset": "bike_outflow",
+      "seed": 2021,
+      "shared_not_three_independent_runs": true,
+      "source_report": "source://results_coursework/fast_matrix_v1/frozen_baselines/bike_outflow/seed_2021/report.json",
+      "mae": 5.476361442521171,
+      "rmse": 13.994346741355475,
+      "mse": 195.8417407172866
+    }
+  ]
+}

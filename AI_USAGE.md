@@ -200,3 +200,13 @@ All evidence paths are relative to this repository root.
   comparison information-matched.
 - All seven agent logs are under `logs/agents/`; the decisions and human verifications
   above are the authoritative record and were not delegated to any agent.
+
+## H1 publication update — 2026-10-26 — yixuan wang
+
+- **Tool:** OpenAI Codex; this publication entry does not assert an unverified model/version or human approval.
+- **User-authorized task:** publish only H1 code and completed experiment evidence, update H1 instructions, and identify H1 owner yixuan wang / KAN owner jinfeng guo. Preserve the team's KAN code and results.
+- **Agent assistance:** packaged existing five-dataset and BIKE validation results; added a portable H1 training/evaluation interface and CPU-only plotting/result checks; isolated the frozen H1 baseline/operators under `models/sthsepnet_h1.py` and `layers/h1/` to avoid overwriting KAN.
+- **Verification scope:** targeted interface/information-control tests, a real CUDA weights-loading and raw-flow export smoke check, result/report numerical checks, and one focused checkpoint/resume review. These are release checks, not new accuracy experiments or a full-repository certification.
+- **Evidence:** `research/run_h1.py`, `tests/test_h1_release.py`, `tests/test_bike_validation.py`, `experiments/h1/provenance.json`, and the published per-run reports.
+- **Claim boundaries retained:** one frozen city baseline with three adapter seeds in the main/ablation cohorts; five-epoch budget caps; longer inputs; METR-LA RMSE/MSE deterioration; unstable independent utility-supervision benefit. No claim of language-pretraining superiority.
+- **Sanitization and review status:** machine-local paths/PIDs were removed from published reports without changing scientific values. Original experiments were not modified or rerun. The team remains responsible for reviewing the submission; this entry does not fabricate human verification.

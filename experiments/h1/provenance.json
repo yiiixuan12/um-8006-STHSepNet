@@ -1,0 +1,80 @@
+{
+  "owner": "yixuan wang",
+  "status": "published_completed_h1_evidence",
+  "source_cohorts": [
+    "results_coursework/fast_matrix_v1",
+    "results_coursework/bike_validation_v1"
+  ],
+  "source_artifacts_modified": false,
+  "retraining_performed": false,
+  "main_adapter_reports": 15,
+  "main_fixed_baselines": 5,
+  "ablation_reports": 9,
+  "independent_paired_cases": 3,
+  "sanitization": {
+    "removed": "machine-local process IDs and file modification times only",
+    "paths": "source:// relative provenance; external-local-path:// basename for outside paths",
+    "scientific_numeric_values_and_training_logs_unchanged": true
+  },
+  "verification": {
+    "summary_status_complete": true,
+    "report_metrics_equal_source_summary": true,
+    "mean_and_sample_std_recomputed": true,
+    "all_scientific_numeric_values_finite_and_preserved": true
+  },
+  "copied_original_artifacts": [
+    "ablation/ablation_bars.pdf",
+    "ablation/ablation_bars.png",
+    "ablation/errors/global_long/seed_2021_test.npz",
+    "ablation/errors/global_long/seed_2022_test.npz",
+    "ablation/errors/global_long/seed_2023_test.npz",
+    "ablation/errors/no_utility/seed_2021_test.npz",
+    "ablation/errors/no_utility/seed_2022_test.npz",
+    "ablation/errors/no_utility/seed_2023_test.npz",
+    "cases/paired_24h_case_1.pdf",
+    "cases/paired_24h_case_1.png",
+    "cases/paired_24h_case_2.pdf",
+    "cases/paired_24h_case_2.png",
+    "cases/paired_24h_case_3.pdf",
+    "cases/paired_24h_case_3.png",
+    "cases/paired_24h_curves.csv",
+    "cases/paired_24h_predictions.npz",
+    "main/errors/bike_inflow/baseline_test.npz",
+    "main/errors/bike_inflow/seed_2021_test.npz",
+    "main/errors/bike_inflow/seed_2022_test.npz",
+    "main/errors/bike_inflow/seed_2023_test.npz",
+    "main/errors/bike_outflow/baseline_test.npz",
+    "main/errors/bike_outflow/seed_2021_test.npz",
+    "main/errors/bike_outflow/seed_2022_test.npz",
+    "main/errors/bike_outflow/seed_2023_test.npz",
+    "main/errors/bj500/baseline_test.npz",
+    "main/errors/bj500/seed_2021_test.npz",
+    "main/errors/bj500/seed_2022_test.npz",
+    "main/errors/bj500/seed_2023_test.npz",
+    "main/errors/metr_la/baseline_test.npz",
+    "main/errors/metr_la/seed_2021_test.npz",
+    "main/errors/metr_la/seed_2022_test.npz",
+    "main/errors/metr_la/seed_2023_test.npz",
+    "main/errors/pems03/baseline_test.npz",
+    "main/errors/pems03/seed_2021_test.npz",
+    "main/errors/pems03/seed_2022_test.npz",
+    "main/errors/pems03/seed_2023_test.npz"
+  ],
+  "excluded_large_artifacts": [
+    "raw datasets",
+    "pretrained BERT",
+    "model and optimizer checkpoints",
+    "training caches"
+  ],
+  "window_error_evidence": {
+    "records": 26,
+    "fields": [
+      "origin",
+      "window_mae",
+      "window_mse"
+    ],
+    "source_window_errors_modified": false,
+    "recompute_command": "python research/check_h1_results.py --root experiments/h1",
+    "no_raw_input_series_or_model_checkpoints": true
+  }
+}

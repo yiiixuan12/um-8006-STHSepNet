@@ -1,0 +1,10 @@
+arm,seed,epochs,best_epoch,stop_reason,source_report,mae,rmse,mse
+full,2021,5,3,epoch_cap,source://results_coursework/fast_matrix_v1/bike_inflow/seed_2021/report.json,4.460623313558946,12.451512887806132,155.04017319520221
+full,2022,5,3,epoch_cap,source://results_coursework/fast_matrix_v1/bike_inflow/seed_2022/report.json,4.452609120509023,12.48973823189584,155.99356110128065
+full,2023,5,3,epoch_cap,source://results_coursework/fast_matrix_v1/bike_inflow/seed_2023/report.json,4.544476520952389,12.747206029813018,162.49126156650138
+global_long,2021,5,3,epoch_cap,source://results_coursework/bike_validation_v1/ablations/global_long/seed_2021/report.json,4.820890025272225,13.426563553402573,180.27260885355835
+global_long,2022,5,5,epoch_cap,source://results_coursework/bike_validation_v1/ablations/global_long/seed_2022/report.json,4.762696259477949,13.236428649089703,175.20304338244264
+global_long,2023,5,5,epoch_cap,source://results_coursework/bike_validation_v1/ablations/global_long/seed_2023/report.json,4.853714399410313,13.471106608298353,181.47071325213955
+no_utility,2021,5,3,epoch_cap,source://results_coursework/bike_validation_v1/ablations/no_utility/seed_2021/report.json,4.467110587115034,12.537585596261772,157.19105258359068
+no_utility,2022,5,3,epoch_cap,source://results_coursework/bike_validation_v1/ablations/no_utility/seed_2022/report.json,4.540995538409096,12.831115202455349,164.63751733868077
+no_utility,2023,5,5,epoch_cap,source://results_coursework/bike_validation_v1/ablations/no_utility/seed_2023/report.json,4.4962183430293905,12.680958874244288,160.80671797027497

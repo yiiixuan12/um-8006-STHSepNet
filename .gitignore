@@ -22,3 +22,8 @@ checks/
 *.pem
 *.key
 
+# H1 publishes small evaluation evidence, not checkpoints or raw datasets.
+!experiments/h1/**/*.npz
+outputs/h1_*/
+runs/h1/
+
