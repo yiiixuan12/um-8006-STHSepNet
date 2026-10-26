@@ -191,8 +191,23 @@ python research/check_h1_results.py
 
 - **yixuan wang：H1。** 节点级多周期记忆、历史检索、五数据集主实验、BIKE消融和真实流量案例。
 - **jinfeng guo：H3。** KAN预测头、独立BIKE-Inflow对照及其分析。
+- **jinqi Liu：论文基线复现。** 完成全部五个数据集的三种子基线实验、数据适配、实验登记和结果汇总。
 
 H3不是H1完整方法的删模块消融；两条路线的数值不能跨数据集、跨预算直接排名。H2节点—时间融合仅为此前提出的方向，不属于本次H1已验证贡献。
+
+### 5.1 论文基线复现结果（负责人：jinqi Liu）
+
+基于本地修正版 STH-SepNet（BERT），输入48步、预测48步；以下为种子2021、2022、2023的均值 ± 样本标准差，仅包含基线，不包含H1/H3改进。
+
+| 数据集 | MAE ↓ | RMSE ↓ |
+|---|---:|---:|
+| BIKE-Inflow | 5.51 ± 0.05 | 15.27 ± 0.30 |
+| BIKE-Outflow | 5.47 ± 0.02 | 13.83 ± 0.05 |
+| PEMS03 | 21.34 ± 0.21 | 35.56 ± 0.47 |
+| BJ500 | 5.97 ± 0.10 | 10.28 ± 0.33 |
+| METR-LA | 10.14 ± 0.53 | 17.28 ± 0.68 |
+
+结果见[汇总JSON](results_coursework/run_jinqi_baseline/summary.json)和[逐种子CSV](results_coursework/run_jinqi_baseline/per_seed.csv)。上述为本地复现值，并非论文官方数值；与H1/H3比较时应核对各自的训练配置、输入信息和种子口径。
 
 ## 6. KAN 预测头（H3）— 负责人：jinfeng guo
 
