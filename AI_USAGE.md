@@ -189,23 +189,6 @@ All evidence paths are relative to this repository root.
   - Agent log: `logs/agents/2026-10-20_kan_ablation_plan.md`
 - **Sanitization:** none.
 
----
-
-## KAN cross-cutting summary (historical scope: AI-KAN-001–007 only)
-
-- **Three required phases covered:** paper understanding/reproduction planning
-  (AI-KAN-001, 002), implementation/testing/execution (AI-KAN-003, 004),
-  improvement design/result analysis/adversarial review (AI-KAN-005, 006, 007).
-- **Critical-review episodes (≥1 required):** AI-KAN-005 and AI-KAN-006 are explicit
-  adversarial reviews. In AI-KAN-006 the agent's proposal ("enable `update_grid`, push
-  KAN as main improvement") was **rejected on verified grounds**, and the over-claim
-  "KAN fully better" (AI-KAN-005) was reframed as a metric-dependent mixed result.
-- **Uniform H3 guardrail across these seven KAN entries:** `update_grid=False` and no extra history
-  input were held constant; only the prediction head changes for H3, keeping the
-  comparison information-matched.
-- All seven agent logs are under `logs/agents/`; the decisions and human verifications
-  above are the authoritative record and were not delegated to any agent.
-
 ## H1 ledger — yixuan wang
 
 Tool for the entries below: **OpenAI Codex**. Exact historical model identifiers and
