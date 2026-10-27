@@ -198,4 +198,15 @@ Evidence: [portable entry](../../research/run_h1.py),
 [release tests](../../tests/test_h1_release.py),
 [publication provenance](../../experiments/h1/provenance.json),
 [result guide](../../experiments/h1/README.md),
-[updated report](../../report/final_report.docx).
+[updated report](../../report/CISC8006_Final_Report_STH-SepNet.docx).
+
+## 8. H1 script delivery update on 2026-10-27
+
+The user identified the missing H1 script deliverables. Thin PowerShell wrappers
+now cover dependency setup, interface smoke checks, the existing Python run entry
+and published-result checks. They do not introduce another training implementation
+or silently launch a full queue. Paths are repository-relative and native failures
+stop subsequent commands. PyTorch selection remains explicit rather than inferred
+from a user's machine. Seven wrapper checks and the default wrapper's nine H1
+interface checks passed; no dependencies were installed, no model was trained and
+no GPU experiment was run. See the [script guide](../../scripts/README.md).

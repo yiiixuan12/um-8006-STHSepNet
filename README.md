@@ -19,7 +19,7 @@ H1 与 H3 使用**不同训练配置和输入信息量**，分别与各自的基
 | **jinfeng guo** | H3 改进负责人 | KAN 预测头提出、实现、试点，以及 BIKE-Inflow 与基线（MLP 头）的受控对比 |
 | **jinqi Liu** | 论文基线复现负责人 | 全部五个数据集的三种子基线实验、数据适配、实验登记与结果汇总 |
 
-**比较边界（重要）。** H3 不是从 H1 完整方法中删除某个模块得到的消融；两条路线的数值**不能跨数据集、跨预算直接排名**。各成员的结果分别与其自身控制组比较，并已在报告（`report/final_report.docx`）与实验登记（`experiments/`）中分别记录训练配置、输入信息量与种子口径。
+**比较边界（重要）。** H3 不是从 H1 完整方法中删除某个模块得到的消融；两条路线的数值**不能跨数据集、跨预算直接排名**。各成员的结果分别与其自身控制组比较，并已在[报告](report/CISC8006_Final_Report_STH-SepNet.docx)与实验登记（`experiments/`）中分别记录训练配置、输入信息量与种子口径。
 
 ## 2. 安装环境
 
@@ -28,6 +28,8 @@ Python 3.10；先安装适配显卡的 CUDA 版 PyTorch，再安装依赖：
 ```bash
 python -m pip install -r requirements-pilot.txt
 ```
+
+H1 的 PowerShell 安装封装为 `.\scripts\setup_h1.ps1`（同样需先安装 PyTorch），详见 [H1 脚本说明](scripts/README.md)。
 
 实验环境为 PyTorch 2.10.0+cu128、Transformers 4.44.2，训练与测评使用支持 BF16 的 NVIDIA CUDA GPU。仅查看结果或重新绘图不需要 GPU。
 
@@ -76,6 +78,14 @@ dataset/
 |---|---|---|
 | H1 | `research/run_h1.py` | 基线、改进、消融与评估的统一入口 |
 | H3（KAN） | `src/run_main.py` | 官方入口，`--use_kan` 追加 KAN 开关 |
+
+H1 另提供 [scripts/](scripts/README.md) 下的 `setup_h1.ps1`、`smoke_h1.ps1`、`run_h1.ps1`、`check_h1_results.ps1`，分别用于安装依赖、无训练接口检查、基线/改进/消融/评估，以及结果复算。脚本只包装现有 Python 入口，不改变实验协议；均支持 `-PlanOnly` 预览。例如在 PowerShell 中运行：
+
+```powershell
+.\scripts\smoke_h1.ps1
+.\scripts\run_h1.ps1 -Dataset pems03 -Stage baseline -Seed 2021 -Output runs/h1/pems03/baseline
+.\scripts\run_h1.ps1 -Dataset pems03 -Stage improved -Seed 2021 -Baseline runs/h1/pems03/baseline -Output runs/h1/pems03/seed_2021
+```
 
 若仓库中另有统一入口（如 `run_coursework.py` / `run_coursework.ps1`）已接入等价的 `--use_kan` / `--stage kan` 分支，可按该统一入口运行；替换点、唯一受控变量与结论不变，以当前仓库代码为准，并在本 README 中记录实际使用的入口。
 
