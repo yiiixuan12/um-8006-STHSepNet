@@ -4,7 +4,6 @@ import pandas as pd
 from torch.utils.data import Dataset
 from sklearn.preprocessing import StandardScaler
 from utils.timefeatures import time_features
-from data_provider.m4 import M4Dataset, M4Meta
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -79,11 +78,11 @@ class Dataset_Bike_hour(Dataset):
         df_stamp = df_raw[['date']][border1:border2]
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
         if self.timeenc == 0:
-            df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
-            df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
-            df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-            df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
-            df_stamp['minute'] = df_stamp.date.apply(lambda row: row.minute, 1)
+            df_stamp['month'] = df_stamp.date.dt.month
+            df_stamp['day'] = df_stamp.date.dt.day
+            df_stamp['weekday'] = df_stamp.date.dt.weekday
+            df_stamp['hour'] = df_stamp.date.dt.hour
+            df_stamp['minute'] = df_stamp.date.dt.minute
             df_stamp['minute'] = df_stamp.minute.map(lambda x: x // 15)
             # data_stamp = df_stamp.drop(['date'], 1).values
             data_stamp = df_stamp.drop(columns=['date']).values
@@ -181,11 +180,11 @@ class Dataset_Transport_minute(Dataset):
         df_stamp = df_raw[['date']][border1:border2]
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
         if self.timeenc == 0:
-            df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
-            df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
-            df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-            df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
-            df_stamp['minute'] = df_stamp.date.apply(lambda row: row.minute, 1)
+            df_stamp['month'] = df_stamp.date.dt.month
+            df_stamp['day'] = df_stamp.date.dt.day
+            df_stamp['weekday'] = df_stamp.date.dt.weekday
+            df_stamp['hour'] = df_stamp.date.dt.hour
+            df_stamp['minute'] = df_stamp.date.dt.minute
 
             data_stamp = df_stamp.drop(columns=['date']).values
         elif self.timeenc == 1:
@@ -284,10 +283,10 @@ class Dataset_ETT_hour(Dataset):
         df_stamp = df_raw[['date']][border1:border2]    
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
         if self.timeenc == 0:
-            df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
-            df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
-            df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-            df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
+            df_stamp['month'] = df_stamp.date.dt.month
+            df_stamp['day'] = df_stamp.date.dt.day
+            df_stamp['weekday'] = df_stamp.date.dt.weekday
+            df_stamp['hour'] = df_stamp.date.dt.hour
             data_stamp = df_stamp.drop(['date'], 1).values
             
             
@@ -383,11 +382,11 @@ class Dataset_ETT_minute(Dataset):
         df_stamp = df_raw[['date']][border1:border2]
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
         if self.timeenc == 0:
-            df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
-            df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
-            df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-            df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
-            df_stamp['minute'] = df_stamp.date.apply(lambda row: row.minute, 1)
+            df_stamp['month'] = df_stamp.date.dt.month
+            df_stamp['day'] = df_stamp.date.dt.day
+            df_stamp['weekday'] = df_stamp.date.dt.weekday
+            df_stamp['hour'] = df_stamp.date.dt.hour
+            df_stamp['minute'] = df_stamp.date.dt.minute
             df_stamp['minute'] = df_stamp.minute.map(lambda x: x // 15)
             data_stamp = df_stamp.drop(['date'], 1).values
         elif self.timeenc == 1:
@@ -490,10 +489,10 @@ class Dataset_Custom(Dataset):
         df_stamp = df_raw[['date']][border1:border2]
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
         if self.timeenc == 0:
-            df_stamp['month'] = df_stamp.date.apply(lambda row: row.month, 1)
-            df_stamp['day'] = df_stamp.date.apply(lambda row: row.day, 1)
-            df_stamp['weekday'] = df_stamp.date.apply(lambda row: row.weekday(), 1)
-            df_stamp['hour'] = df_stamp.date.apply(lambda row: row.hour, 1)
+            df_stamp['month'] = df_stamp.date.dt.month
+            df_stamp['day'] = df_stamp.date.dt.day
+            df_stamp['weekday'] = df_stamp.date.dt.weekday
+            df_stamp['hour'] = df_stamp.date.dt.hour
             data_stamp = df_stamp.drop(['date'], 1).values
         elif self.timeenc == 1:
             data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.freq)
@@ -529,6 +528,7 @@ class Dataset_M4(Dataset):
                  features='S', data_path='ETTh1.csv',
                  target='OT', scale=False, inverse=False, timeenc=0, freq='15min',
                  seasonal_patterns='Yearly'):
+        from data_provider.m4 import M4Meta
         self.features = features
         self.target = target
         self.scale = scale
@@ -549,6 +549,7 @@ class Dataset_M4(Dataset):
 
     def __read_data__(self):
         # M4Dataset.initialize()
+        from data_provider.m4 import M4Dataset
         if self.flag == 'train':
             dataset = M4Dataset.load(training=True, dataset_file=self.root_path)
         else:

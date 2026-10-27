@@ -184,7 +184,7 @@ def document_window_errors(output, copied):
 The package includes 26 original per-window error arrays: five fixed baseline tests, 15 main adapter tests, and six additional ablation tests. Each file contains only `origin`, `window_mae` and `window_mse`, not original input series. The full-method ablation is the same BIKE-Inflow main result and is not duplicated again. With NumPy installed, run from the repository root:
 
 ```powershell
-python research/check_h1_results.py --root experiments/h1
+python research/check_h1_results.py --root results/h1
 ```
 
 This independently recomputes test MAE, MSE and RMSE from the published window errors and requires exact equality with all 26 JSON report records. It also checks finite arrays, origin/window counts, consistent main/ablation test windows, and exits nonzero on failure. No BERT, dataset, CUDA or model checkpoints are needed. This checks arithmetic consistency of published evaluation evidence, not a fresh model inference or proof of training correctness.
@@ -195,7 +195,7 @@ This independently recomputes test MAE, MSE and RMSE from the published window e
     provenance["window_error_evidence"] = {
         "records": 26, "fields": ["origin", "window_mae", "window_mse"],
         "source_window_errors_modified": False,
-        "recompute_command": "python research/check_h1_results.py --root experiments/h1",
+        "recompute_command": "python research/check_h1_results.py --root results/h1",
         "no_raw_input_series_or_model_checkpoints": True}
     provenance["copied_original_artifacts"] = sorted(set(provenance["copied_original_artifacts"] + copied))
     write_json(path, provenance)
@@ -291,7 +291,7 @@ The 24-hour case cohort is separate: three independently trained paired baseline
 From the repository root, run:
 
 ```powershell
-python research/export_h1_results.py --source-root PATH_TO_COMPLETED_PROJECT --output experiments/h1
+python research/export_h1_results.py --source-root PATH_TO_COMPLETED_PROJECT --output results/h1
 ```
 
 The source project must contain the completed `results_coursework/fast_matrix_v1` and `results_coursework/bike_validation_v1` trees. The exporter reads them without modification, verifies completed counts, report metrics and sample-standard-deviation aggregates, and copies already-generated figures and case values.
@@ -324,7 +324,7 @@ Published JSON removes machine-local process IDs and file modification times, an
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, required=True)
-    parser.add_argument("--output", type=Path, default=Path("experiments/h1"))
+    parser.add_argument("--output", type=Path, default=Path("results/h1"))
     parser.add_argument("--errors-only", action="store_true", help="Add window errors/docs to an already exported package without repeating JSON export checks")
     args = parser.parse_args()
     if args.errors_only:

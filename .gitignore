@@ -1,7 +1,9 @@
 __pycache__/
 *.py[cod]
 checkpoints/
-results/
+/results/*
+!/results/h1/
+!/results/h1/**
 results_coursework/
 pilot_results/
 huggingface/google_bert/
@@ -23,7 +25,12 @@ checks/
 *.key
 
 # H1 publishes small evaluation evidence, not checkpoints or raw datasets.
-!experiments/h1/**/*.npz
+!/results/h1/**/*.npz
 outputs/h1_*/
 runs/h1/
+outputs/official_entry/
+outputs/compatibility_*/
+outputs/kan_queue/
+outputs/training_smoke/
+runs/h1_queue/
 

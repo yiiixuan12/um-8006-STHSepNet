@@ -14,8 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--predictions", type=Path, default=ROOT / "experiments/h1/cases/paired_24h_predictions.npz")
-    parser.add_argument("--report", type=Path, default=ROOT / "experiments/h1/cases/report.json")
+    parser.add_argument("--predictions", type=Path, default=ROOT / "results/h1/cases/paired_24h_predictions.npz")
+    parser.add_argument("--report", type=Path, default=ROOT / "results/h1/cases/report.json")
     parser.add_argument("--output", type=Path, default=ROOT / "outputs/h1_cases")
     args = parser.parse_args()
     report = json.loads(args.report.read_text(encoding="utf-8-sig"))

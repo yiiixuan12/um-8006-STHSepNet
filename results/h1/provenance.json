@@ -74,7 +74,7 @@
       "window_mse"
     ],
     "source_window_errors_modified": false,
-    "recompute_command": "python research/check_h1_results.py --root experiments/h1",
+    "recompute_command": "python research/check_h1_results.py --root results/h1",
     "no_raw_input_series_or_model_checkpoints": true
   }
 }

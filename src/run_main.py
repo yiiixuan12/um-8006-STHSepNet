@@ -1,4 +1,13 @@
 import argparse
+import json
+import sys
+from pathlib import Path
+
+# Support the documented `python src/run_main.py` from the repository root.
+ROOT = Path(__file__).resolve().parents[1]
+for directory in (ROOT, ROOT / 'src'):
+    if str(directory) not in sys.path:
+        sys.path.insert(0, str(directory))
 import torch
 from accelerate import Accelerator, DeepSpeedPlugin
 from accelerate import DistributedDataParallelKwargs
@@ -36,7 +45,7 @@ parser.add_argument('--model_id', type=str, required=False, default='test', help
 parser.add_argument('--model_comment', type=str, required=False, default='none', help='prefix when saving test results')
 parser.add_argument('--model', type=str, required=False, default='pool',
                     help='model name, options: [Autoformer, DLinear, pool, mtgnn, agcrn, stgcn, TGCN]')
-parser.add_argument('--seed', type=int, default=2021, help='random seed')
+# --seed is declared below with the ablation switches.
 
 # data loader
 parser.add_argument('--data', type=str, required=False, default='outflow', help='dataset type')
@@ -138,6 +147,8 @@ parser.add_argument('--use_kan', action='store_true', default=False,
                     help='replace the MLP prediction head (FlattenHead) with KANLinear')
 parser.add_argument('--kan_grid_size', type=int, default=5, help='KANLinear grid size')
 parser.add_argument('--kan_spline_order', type=int, default=3, help='KANLinear spline order')
+parser.add_argument('--smoke', action='store_true', help='One batch per split and one epoch; not accuracy evidence')
+parser.add_argument('--output-dir', type=Path, help='New output directory; contains checkpoints and prediction arrays')
 
 
 
@@ -152,6 +163,15 @@ else:
     accelerator = Accelerator(kwargs_handlers=[ddp_kwargs])
 
 def main():
+    output = args.output_dir or ROOT / 'outputs' / 'official_entry' / args.data / ('kan' if args.use_kan else 'mlp') / f'seed_{args.seed}'
+    output = output.resolve()
+    if output.exists():
+        raise FileExistsError(f'Choose a new --output-dir: {output}')
+    output.mkdir(parents=True)
+    args.output_dir = output
+    if args.smoke:
+        args.train_epochs = 1
+        args.num_workers = 0
     # apply seed inside main so --seed takes effect (fixes hardcoded seed)
     random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -199,7 +219,7 @@ def main():
             model = TimeLLM.Model(args).float()
 
 
-        path = os.path.join(args.checkpoints,
+        path = os.path.join(str(output / 'checkpoints'),
                             setting + '-' + args.model_comment)  # unique checkpoint saving path
         args.content = load_content(args)
         if not os.path.exists(path) and accelerator.is_local_main_process:
@@ -355,8 +375,8 @@ def main():
             if early_stopping.early_stop:
                 accelerator.print("Early stopping")
 
-                np.save(f'results/data_pred/{args.data}_{args.llm_model}_pred.npy', preds)
-                np.save(f'results/data_pred/{args.data}_{args.llm_model}_true.npy', trues)
+                np.save(output / 'train_pred.npy', preds)
+                np.save(output / 'train_true.npy', trues)
                 vali_save(args, accelerator, model, test_data, test_loader, criterion, mae_metric)
                 saved = True
                 break
@@ -365,7 +385,7 @@ def main():
 
         torch.cuda.empty_cache()
         checkpoint_path = path + '/' + 'checkpoint'
-        state_dict = torch.load(checkpoint_path)
+        state_dict = torch.load(checkpoint_path, map_location=accelerator.device, weights_only=True)
         # Checkpoints are saved from the (possibly DDP-wrapped) model and carry a
         # 'module.' prefix; the unwrapped model expects keys without that prefix.
         new_state_dict = {}
@@ -374,12 +394,16 @@ def main():
             new_state_dict[new_key] = state_dict[key]
         model.load_state_dict(new_state_dict)
         model.eval()
-        vali_save(args, accelerator, model, test_data, test_loader, criterion, mae_metric)
+        predictions, targets = vali_save(args, accelerator, model, test_data, test_loader, criterion, mae_metric)
+        error = np.concatenate(predictions, axis=0) - np.concatenate(targets, axis=0)
+        mse = float(np.mean(np.square(error)))
+        report = {'status': 'smoke_completed_not_accuracy_evidence' if args.smoke else 'completed',
+                  'configuration': vars(args), 'epochs': epoch + 1,
+                  'checkpoint_selection': 'validation MSE',
+                  'test': {'mae': float(np.mean(np.abs(error))), 'mse': mse, 'rmse': mse ** .5}}
+        (output / f'report_{ii}.json').write_text(json.dumps(report, indent=2, default=str), encoding='utf-8')
     accelerator.wait_for_everyone()
 
-    if accelerator.is_local_main_process:
-        path = './checkpoints'  # unique checkpoint saving path
-        del_files(path)  # delete checkpoint files
-        accelerator.print('success delete checkpoints')
+    accelerator.print(f'Completed; checkpoints and predictions retained in {output}')
 if __name__ == '__main__':
     main()

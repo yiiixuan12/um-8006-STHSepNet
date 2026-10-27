@@ -21,7 +21,7 @@ The 24-hour case cohort is separate: three independently trained paired baseline
 From the repository root, run:
 
 ```powershell
-python research/export_h1_results.py --source-root PATH_TO_COMPLETED_PROJECT --output experiments/h1
+python research/export_h1_results.py --source-root PATH_TO_COMPLETED_PROJECT --output results/h1
 ```
 
 The source project must contain the completed `results_coursework/fast_matrix_v1` and `results_coursework/bike_validation_v1` trees. The exporter reads them without modification, verifies completed counts, report metrics and sample-standard-deviation aggregates, and copies already-generated figures and case values.
@@ -33,7 +33,7 @@ Published JSON removes machine-local process IDs and file modification times, an
 The package includes 26 original per-window error arrays: five fixed baseline tests, 15 main adapter tests, and six additional ablation tests. Each file contains only `origin`, `window_mae` and `window_mse`, not original input series. The full-method ablation is the same BIKE-Inflow main result and is not duplicated again. With NumPy installed, run from the repository root:
 
 ```powershell
-python research/check_h1_results.py --root experiments/h1
+python research/check_h1_results.py --root results/h1
 ```
 
 This independently recomputes test MAE, MSE and RMSE from the published window errors and requires exact equality with all 26 JSON report records. It also checks finite arrays, origin/window counts, consistent main/ablation test windows, and exits nonzero on failure. No BERT, dataset, CUDA or model checkpoints are needed. This checks arithmetic consistency of published evaluation evidence, not a fresh model inference or proof of training correctness.

@@ -43,7 +43,7 @@ class EarlyStopping:
         self.counter = 0
         self.best_score = None
         self.early_stop = False
-        self.val_loss_min = np.Inf
+        self.val_loss_min = np.inf
         self.delta = delta
         self.save_mode = save_mode
 
@@ -194,8 +194,11 @@ def vali_save(args, accelerator, model, vali_data, vali_loader, criterion, mae_m
             total_pred.append(inverse_pred)
             total_true.append(inverse_true)
 
-    np.save(f'./results/data_pred/{args.data}_pred_{args.model}.npy', np.concatenate(total_pred, axis=0))
-    np.save(f'./results/data_pred/{args.data}_true_{args.model}.npy', np.concatenate(total_true, axis=0))
+    from pathlib import Path
+    output = Path(getattr(args, 'output_dir', './results/data_pred'))
+    output.mkdir(parents=True, exist_ok=True)
+    np.save(output / f'{args.data}_pred_{args.model}.npy', np.concatenate(total_pred, axis=0))
+    np.save(output / f'{args.data}_true_{args.model}.npy', np.concatenate(total_true, axis=0))
     return total_pred, total_true
 
 

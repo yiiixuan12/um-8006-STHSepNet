@@ -84,7 +84,7 @@ class FlattenHeadKAN(nn.Module):
         super().__init__()
         self.n_vars = n_vars
         self.flatten = nn.Flatten(start_dim=-2)
-        from kan.KANLinear import KANLinear
+        from KAN.KANLinear import KANLinear
         self.linear = KANLinear(nf, target_window,
                                 grid_size=grid_size, spline_order=spline_order)
         self.dropout = nn.Dropout(head_dropout)

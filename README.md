@@ -2,7 +2,7 @@
 
 本项目在 [STH-SepNet](https://github.com/jiawenchen10/STHSepNet)（KDD'2025）之上完成复现与两条**独立**改进线：
 
-- **H1 —— 节点级多周期记忆与预测效用监督的历史检索（负责人：yixuan wang）。** 五个数据集的主实验、BIKE-Inflow 三种子消融与未来 24 小时案例已完成，见[结果与图表](experiments/h1/README.md)。
+- **H1 —— 节点级多周期记忆与预测效用监督的历史检索（负责人：yixuan wang）。** 五个数据集的主实验、BIKE-Inflow 三种子消融与未来 24 小时案例已完成，见[结果与图表](results/h1/README.md)。
 - **H3 —— KAN 预测头（负责人：jinfeng guo）。** 保留独立的 BIKE-Inflow 三种子对照，见[第 7 节](#7-kan-预测头h3jinfeng-guo)。
 
 H1 与 H3 使用**不同训练配置和输入信息量**，分别与各自的基线比较，不能视为严格同条件的直接对比；本项目**没有**声称两者已被组合成同一个模型。H2（节点—时间自适应融合）此前曾被提出，但不在本次已验证的贡献之内。
@@ -30,6 +30,8 @@ python -m pip install -r requirements-pilot.txt
 ```
 
 H1 的 PowerShell 安装封装为 `.\scripts\setup_h1.ps1`（同样需先安装 PyTorch），详见 [H1 脚本说明](scripts/README.md)。
+
+当前三条训练路线的统一脚本见 [scripts/README.md](scripts/README.md)：`setup_training.ps1` 安装运行依赖，`smoke_training.ps1` 执行Baseline/H1/KAN真实训练冒烟，`run_baseline_seeds.ps1`、`run_kan_seeds.ps1`、`run_h1_seeds.ps1` 分别运行各自种子队列。所有脚本支持 `-PlanOnly`。
 
 实验环境为 PyTorch 2.10.0+cu128、Transformers 4.44.2，训练与测评使用支持 BF16 的 NVIDIA CUDA GPU。仅查看结果或重新绘图不需要 GPU。
 
@@ -76,7 +78,8 @@ dataset/
 
 | 路线 | 入口 | 说明 |
 |---|---|---|
-| H1 | `research/run_h1.py` | 基线、改进、消融与评估的统一入口 |
+| 论文基线（Jinqi） | `research/run_coursework.py --stage baseline` | 五个数据集，12层修正版BERT基线 |
+| H1 | `research/run_h1.py` | H1配套基线、改进、消融与评估的统一入口 |
 | H3（KAN） | `src/run_main.py` | 官方入口，`--use_kan` 追加 KAN 开关 |
 
 H1 另提供 [scripts/](scripts/README.md) 下的 `setup_h1.ps1`、`smoke_h1.ps1`、`run_h1.ps1`、`check_h1_results.ps1`，分别用于安装依赖、无训练接口检查、基线/改进/消融/评估，以及结果复算。脚本只包装现有 Python 入口，不改变实验协议；均支持 `-PlanOnly` 预览。例如在 PowerShell 中运行：
@@ -87,7 +90,24 @@ H1 另提供 [scripts/](scripts/README.md) 下的 `setup_h1.ps1`、`smoke_h1.ps1
 .\scripts\run_h1.ps1 -Dataset pems03 -Stage improved -Seed 2021 -Baseline runs/h1/pems03/baseline -Output runs/h1/pems03/seed_2021
 ```
 
-若仓库中另有统一入口（如 `run_coursework.py` / `run_coursework.ps1`）已接入等价的 `--use_kan` / `--stage kan` 分支，可按该统一入口运行；替换点、唯一受控变量与结论不变，以当前仓库代码为准，并在本 README 中记录实际使用的入口。
+三条路线的入口分别如上：KAN只由 `src/run_main.py --use_kan` 启用；`run_coursework.py` 的 `improved` 是历史适配器，不代替当前H1入口。
+
+Jinqi基线正式训练（数据集可选 `bike_inflow`、`bike_outflow`、`pems03`、`bj500`、`metr_la`，种子分别使用2021、2022、2023）：
+
+```powershell
+python -u research/run_coursework.py --dataset pems03 --seed 2021 --stage baseline --output results_coursework/run_jinqi_baseline/pems03/seed_2021
+```
+
+真实数据/GPU冒烟检查（各一轮、每个划分一个批次；输出目录必须是新的；指标不作精度证据）：
+
+```powershell
+python -u research/run_coursework.py --dataset bike_outflow --seed 2021 --stage baseline --smoke --output results_coursework/smoke_baseline
+python -u scripts/smoke_h1_training.py --dataset bike_outflow --output results_coursework/smoke_h1
+```
+
+H1冒烟包括基线训练、训练集数值校准、适配器训练、验证、检查点重载和测试。正式H1命令及预算保持下文设置。旧输出仍有源码快照保护；本次修复后的代码应使用新目录，不混用旧源码续训。
+
+基线单元、集成及评估测试见 [tests/README.md](tests/README.md)。离线测试命令：`python -m unittest tests.test_baseline tests.test_coursework tests.test_coursework_early_stop tests.test_training_scripts`；真实BERT/GPU测试需按该说明显式启用。
 
 ### 4.2 H1：冻结基线 → 改进与消融 → 评估
 
@@ -162,7 +182,7 @@ python -u src/run_main.py --task_name long_term_forecast --is_training 1 \
   --seed 2021 --use_kan --kan_grid_size 5 --kan_spline_order 3 --num_workers 0
 ```
 
-另两个种子将 `--seed` 分别改为 42、7，其余参数完全一致。每个种子单独保存日志、预测/真值数组与 `report.json`，**不要覆盖已有 run**。
+另两个种子将 `--seed` 分别改为 42、7，其余参数完全一致。每个种子单独保存日志、预测/真值数组与 `report_0.json`，**不要覆盖已有 run**。默认输出在 `outputs/official_entry/<data>/<mlp或kan>/seed_<seed>/`，包含检查点；可用 `--output-dir` 指定新目录，已有目录会拒绝覆盖。给上述MLP或KAN命令追加 `--smoke --output-dir outputs/smoke_kan` 可执行一轮、每个划分一个批次的真实训练检查，结果会标记为smoke。正式训练不要加 `--smoke`。
 
 **（3）冒烟与验证**（在跑正式 3 seeds 前至少完成）：
 
@@ -190,7 +210,7 @@ H1 主实验与消融的三个种子是**同一冻结骨干下的 adapter 种子
 
 ## 6. H1 实验结果（负责人：yixuan wang）
 
-完整基线对照、15 份报告、三指标均值/样本标准差见[主实验表](experiments/h1/main/table.md)、[逐种子 CSV](experiments/h1/main/per_seed.csv) 与[单份基线 CSV](experiments/h1/main/baselines.csv)。以下均为本地修正版结果，不是原论文官方指标：
+完整基线对照、15 份报告、三指标均值/样本标准差见[主实验表](results/h1/main/table.md)、[逐种子 CSV](results/h1/main/per_seed.csv) 与[单份基线 CSV](results/h1/main/baselines.csv)。以下均为本地修正版结果，不是原论文官方指标：
 
 | 数据集 | H1 MAE ↓ | H1 RMSE ↓ | H1 MSE ↓ |
 |---|---:|---:|---:|
@@ -204,15 +224,15 @@ H1 主实验与消融的三个种子是**同一冻结骨干下的 adapter 种子
 
 ### 6.1 BIKE-Inflow 三种子消融
 
-![H1 消融柱状图](experiments/h1/ablation/ablation_bars.png)
+![H1 消融柱状图](results/h1/ablation/ablation_bars.png)
 
-[消融表与定义](experiments/h1/ablation/table.md)。节点个体长期历史在三个种子上方向一致；效用辅助监督只有小幅平均收益、且第三个种子反向，**不能声称两项设计均显著且稳定有效**。误差棒为样本标准差，不是置信区间。
+[消融表与定义](results/h1/ablation/table.md)。节点个体长期历史在三个种子上方向一致；效用辅助监督只有小幅平均收益、且第三个种子反向，**不能声称两项设计均显著且稳定有效**。误差棒为样本标准差，不是置信区间。
 
 ### 6.2 未来 24 小时真实流量案例
 
-三对独立种子的原单位预测与真实流量对比：[案例 1](experiments/h1/cases/paired_24h_case_1.png)、[案例 2](experiments/h1/cases/paired_24h_case_2.png)、[案例 3](experiments/h1/cases/paired_24h_case_3.png)，以及[逐点 CSV](experiments/h1/cases/paired_24h_curves.csv)。
+三对独立种子的原单位预测与真实流量对比：[案例 1](results/h1/cases/paired_24h_case_1.png)、[案例 2](results/h1/cases/paired_24h_case_2.png)、[案例 3](results/h1/cases/paired_24h_case_3.png)，以及[逐点 CSV](results/h1/cases/paired_24h_curves.csv)。
 
-![未来 24 小时案例](experiments/h1/cases/paired_24h_case_1.png)
+![未来 24 小时案例](results/h1/cases/paired_24h_case_1.png)
 
 单次直接预测 48 小时、展示前 24 小时；训练段均值/标准差还原，无额外平滑或截断，阴影为三个种子的实际范围。日期与站点按时间位置/训练流量分位选择，**未挑选预测较好的案例**；仍存在高估与过平滑，不能用几个案例替代整体评价。
 
@@ -221,7 +241,7 @@ H1 主实验与消融的三个种子是**同一冻结骨干下的 adapter 种子
 不用训练即可从已发布的结果重新绘图：
 
 ```bash
-python research/plot_bike_ablation.py --summary experiments/h1/ablation/summary.json
+python research/plot_bike_ablation.py --summary results/h1/ablation/summary.json
 python research/plot_h1_cases.py
 ```
 

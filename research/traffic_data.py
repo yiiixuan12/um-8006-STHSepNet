@@ -65,7 +65,9 @@ def load_pems03(
         raw=raw,
         normalized=normalized,
         marks=marks,
-        timestamps_ns=timestamps.astype("int64").to_numpy(),
+        # Integer conversion retains pandas' datetime resolution (ns/us/s).
+        # Normalize explicitly: downstream interval checks expect nanoseconds.
+        timestamps_ns=timestamps.to_numpy(dtype="datetime64[ns]").astype(np.int64),
         mean=mean,
         std=std,
         train_min=train_norm.min(axis=0),

@@ -4,7 +4,7 @@ import os, sys
 import torch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-from kan.KANLinear import KANLinear
+from KAN.KANLinear import KANLinear
 from models.ST_SepNet import FlattenHead, FlattenHeadKAN
 
 NF = 192      # = d_ff * patch_nums in the BIKE config

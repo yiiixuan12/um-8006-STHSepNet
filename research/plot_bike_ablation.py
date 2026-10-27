@@ -18,7 +18,7 @@ def main():
         "--summary",
         type=Path,
         default=Path(__file__).resolve().parents[1]
-        / "experiments/h1/ablation/summary.json",
+        / "results/h1/ablation/summary.json",
     )
     parser.add_argument("--output-dir", type=Path, default=Path(__file__).resolve().parents[1] / "outputs/h1_ablation")
     args = parser.parse_args()

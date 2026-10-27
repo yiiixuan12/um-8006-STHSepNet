@@ -33,7 +33,8 @@ from models.periodic_tokens import periodic_numeric_features
 
 SOURCES=('research/run_coursework.py','research/coursework_data.py','research/coursework_config.json',
     'research/common.py','research/traffic_data.py','research/run_periodic_bert_repair.py',
-    'models/ST_SepNet.py','models/periodic_bert_v4.py','models/periodic_tokens.py',
+    'models/sthsepnet_h1.py','layers/h1/STHGNN.py','layers/h1/HyperGNN.py','layers/h1/AdaGNN.py',
+    'models/periodic_bert_v4.py','models/periodic_tokens.py',
     'models/periodic_memory_policy.py','models/bert_backbone.py','models/spatial_context.py',
     'models/periodic_refinement.py','models/utility_recoupling.py','models/holt_operator.py',
     'research/periodic_relation_data.py','research/traffic_evaluation.py',
@@ -255,10 +256,15 @@ def run(args):
     config=json.loads((ROOT/'research/coursework_config.json').read_text())
     config.update(root_path=str(ROOT/'dataset'/spec['folder']),adjacency_path=spec['adj'],node_num=spec['nodes'],
         llm_path=str(args.bert_path.resolve()),min_values=bundle.train_min.tolist(),max_values=bundle.train_max.tolist(),
-        data={'pems03':'PEMS03','metr_la':'METR'}[args.dataset],d_ff=spec['d_ff'],enc_in=spec['nodes'])
+        data={'pems03':'PEMS03','metr_la':'METR','bj500':'BJ',
+              'bike_inflow':'inflow','bike_outflow':'outflow'}[args.dataset],d_ff=spec['d_ff'],enc_in=spec['nodes'])
+    if spec['period'] != 288:
+        config['prompt_domain']=1
+        config['content']=(f"{args.dataset} bicycle demand at {spec['nodes']} stations, "
+                           'sampled hourly. Timestamps are calendar features, not event labels.')
     report['base_model_config']=config; report['process_id']=os.getpid(); write_json(report_path,report)
     seed_all(args.seed); torch.set_num_threads(4)
-    from models.ST_SepNet import Model
+    from models.sthsepnet_h1 import Model
     base=Model(SimpleNamespace(**config)).cuda()
     report['baseline_parameters']={'total':sum(p.numel() for p in base.parameters()),
         'trainable':sum(p.numel() for p in base.parameters() if p.requires_grad)}
@@ -302,7 +308,7 @@ def run(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--dataset',choices=('pems03','metr_la'),required=True)
+    parser.add_argument('--dataset',choices=tuple(SPECS),required=True)
     parser.add_argument('--seed',type=int,required=True); parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--stage',choices=('baseline','improved','pair'),default='pair')
     parser.add_argument('--bert-path',type=Path,default=ROOT/'huggingface/google_bert')

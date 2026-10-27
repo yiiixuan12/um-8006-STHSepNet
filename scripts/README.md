@@ -1,4 +1,38 @@
-# H1 运行脚本 — yixuan wang
+# 训练脚本
+
+在已激活的训练环境中，从项目根目录用PowerShell运行以下五个入口。默认使用当前环境的 `python`；可通过 `-PythonPath` 指定解释器。数据集和本地BERT需提前准备。
+
+| 脚本 | 默认行为 |
+|---|---|
+| `setup_training.ps1` | 检查Python 3.10+、已安装的CUDA版PyTorch；安装三条BERT训练路线的运行依赖并执行pip check |
+| `smoke_training.ps1` | 基线、H1、MLP控制组和KAN各执行真实GPU短训练；不作为精度证据 |
+| `run_baseline_seeds.ps1` | 五个数据集，独立基线种子2021/2022/2023 |
+| `run_kan_seeds.ps1` | BIKE-Inflow，MLP与KAN各运行2021/42/7 |
+| `run_h1_seeds.ps1` | 五个数据集各训练一个seed-2021冻结基线，再训练2021/2022/2023三个适配器种子 |
+
+```powershell
+.\scripts\setup_training.ps1
+.\scripts\smoke_training.ps1
+.\scripts\run_baseline_seeds.ps1
+.\scripts\run_kan_seeds.ps1
+.\scripts\run_h1_seeds.ps1
+```
+
+安装脚本不安装或替换PyTorch/CUDA，也不下载数据和BERT。`requirements-training.txt`是已修复代码的运行依赖范围，适用于现代Python环境；原历史环境锁定文件仍在 `environment/`。原 `setup_h1.ps1` 仍保留供Python 3.10历史环境使用。
+
+先加 `-PlanOnly` 可预览命令，无安装、训练或输出目录写入。正式队列按顺序运行，任何失败立即停止。不要同时启动多个队列争用同一GPU。
+
+```powershell
+.\scripts\run_baseline_seeds.ps1 -Datasets bike_outflow -Seeds 2022,2023 -PlanOnly
+.\scripts\run_kan_seeds.ps1 -Heads kan -Seeds 2021,42,7 -PlanOnly
+.\scripts\run_h1_seeds.ps1 -Datasets pems03 -Seeds 2021,2022,2023 -PlanOnly
+```
+
+Baseline默认输出 `results_coursework/run_jinqi_baseline/<dataset>/seed_<seed>/`；H1默认输出 `runs/h1_queue/<dataset>/baseline/` 和 `seed_<seed>/`；KAN默认输出 `outputs/kan_queue/<mlp或kan>/seed_<seed>/`。三个队列均支持 `-OutputRoot`。完整结果会跳过；Baseline和H1只在存在最后检查点时自动续训，仍由训练入口核查源码快照。旧实验与当前源码不一致时应换新目录，不能强行混用。KAN入口不支持中断续训，未完成目录需人工检查后换新目录。
+
+统一冒烟默认使用BIKE-Outflow检查基线与H1，BIKE-Inflow检查MLP与KAN；每个划分一个批次、一轮训练，覆盖保存、重载和测试。H1还执行训练集数值校准。每次默认新建带时间戳的输出目录，报告标记 `smoke=true`。可用 `-Datasets pems03` 检查五分钟数据的基线与H1，或用 `-OutputRoot` 指定一个尚不存在的目录。Smoke与正式实验输出严格分开。
+
+## 原H1单次运行工具 — yixuan wang
 
 这些 PowerShell 脚本只包装现有 Python 入口，不改变模型或实验协议。请在 **PowerShell** 中运行（不是 CMD）；Linux/macOS 可直接使用主 README 的 Python 命令。
 

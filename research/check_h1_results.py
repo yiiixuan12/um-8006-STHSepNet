@@ -72,6 +72,6 @@ def check(root):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=Path("experiments/h1"))
+    parser.add_argument("--root", type=Path, default=Path("results/h1"))
     args = parser.parse_args()
     check(args.root)

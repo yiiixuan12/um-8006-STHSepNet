@@ -382,4 +382,22 @@ Reconstructed on 2026-10-23 from the conversation history; the earlier ledger an
   - Agent log: [2026-10-23-summary-all-datasets](logs/agents/2026-10-23-summary-all-datasets.md)
 - **Sanitization:** Local absolute paths omitted; no credentials or raw transcripts included.
 
-This ledger documents the available Jinqi episodes only. It does not claim that these two entries alone cover every course-required phase or constitute a completed adversarial-review episode.
+### AI-JINQI-003 — 2026-10-27 — Jinqi — training scripts
+- **Stage:** Implementation / debugging / experiment execution support
+- **Tool / model:** OpenAI Codex (gpt-6.1-sol); sampling settings not exposed.
+- **Task and decision: Accepted.** Generate installation, Baseline/H1/KAN smoke-training and per-seed reproduction scripts. Repair entry-point/model imports and timestamp/Pandas/NumPy compatibility so the documented commands can start training. Keep each cohort's settings and output directories distinct.
+- **Agent verification:** Eleven wrapper/queue tests passed; real GPU smoke training completed for Baseline, H1 and both MLP/KAN heads. Installation-script commands were previewed by the agent.
+- **Human verification:** The user confirmed that manual testing passed and all scripts ran successfully in the local environment.
+- **Evidence:** [script guide](scripts/README.md), [queue implementation](scripts/training_runs.py), [agent log](logs/agents/2026-10-27-training-scripts.md).
+- **Sanitization:** Machine-specific paths and raw transcripts omitted. Smoke metrics are not accuracy evidence.
+
+### AI-JINQI-004 — 2026-10-27 — Jinqi — baseline tests
+- **Stage:** Implementation / testing / evaluation validation
+- **Tool / model:** OpenAI Codex (gpt-6.1-sol); sampling settings not exposed.
+- **Task and decision: Accepted.** Audit baseline coverage and add data, evaluation, checkpoint/resume, aggregation and real-BERT/GPU integration tests without changing training logic.
+- **Agent verification:** Twenty-seven targeted CPU/control-flow tests passed. One opt-in GPU integration test passed on both BIKE-Outflow and PEMS03, including 12-layer LoRA/frozen-BERT checks.
+- **Human verification:** The user manually inspected the AI-run test results and confirmed that all tests passed; this records review of the results rather than a separate human rerun.
+- **Evidence:** [baseline tests](tests/test_baseline.py), [GPU test](tests/test_baseline_gpu.py), [test guide](tests/README.md), [agent log](logs/agents/2026-10-27-baseline-tests.md).
+- **Sanitization:** Synthetic fixtures and temporary smoke outputs; no credentials or original dataset values included in the log.
+
+This ledger documents the available Jinqi episodes only. It does not claim that these four entries alone cover every course-required phase or constitute a completed adversarial-review episode.

@@ -1,6 +1,6 @@
 param(
     [string]$PythonPath = 'python',
-    [string]$ResultsRoot = 'experiments/h1',
+    [string]$ResultsRoot = 'results/h1',
     [switch]$Redraw,
     [switch]$PlanOnly
 )
