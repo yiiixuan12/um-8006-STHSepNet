@@ -192,8 +192,9 @@ All evidence paths are relative to this repository root.
 ## H1 ledger — yixuan wang
 
 Tool for the entries below: **OpenAI Codex**. Exact historical model identifiers and
-sampling settings are not asserted where they are not recoverable. Entries were
-summarized on 2026-10-26 from the recorded dialogue and published artifacts. Dates
+sampling settings are not asserted where they are not recoverable. Entries
+AI-H1-001 through AI-H1-007 were summarized on 2026-10-26 from the recorded dialogue
+and published artifacts; subsequent entries carry their own dates. Dates
 refer to recorded discussion/execution periods, not invented dates for earlier work.
 
 ### AI-H1-001 — Undated earlier dialogue — hypothesis selection
@@ -313,7 +314,7 @@ refer to recorded discussion/execution periods, not invented dates for earlier w
   [release tests](tests/test_h1_release.py),
   [publication provenance](experiments/h1/provenance.json),
   [published result guide](experiments/h1/README.md),
-  [updated team report](report/final_report.docx).
+  [updated team report](report/CISC8006_Final_Report_STH-SepNet.docx).
 - **Verification boundary:** the recorded release checks comprise 13 targeted
   checks, a real CUDA loading/raw-flow smoke check, 78 metric recomputations and
   one focused checkpoint/resume review. They are agent-executed release checks,
@@ -326,6 +327,26 @@ refer to recorded discussion/execution periods, not invented dates for earlier w
   preservation. These document checks did not rerun training or certify the
   teammate's scientific claims.
 
+
+### AI-H1-008 — 2026-10-27 — portable PowerShell scripts
+
+- **Task:** fill the missing H1 installation, smoke-check and reproduction script
+  deliverables without changing teammates' entry points or scientific results.
+- **Decision:** add thin PowerShell wrappers for dependency installation,
+  stdlib-only smoke checks, the existing baseline/improved/ablation/evaluation
+  interface, and published-result recomputation. Use repo-relative file paths,
+  argument arrays, explicit native-exit checks and an execution-free `-PlanOnly`.
+  Keep the old local coursework queue as a clearly labeled historical script;
+  do not silently launch a full multi-city queue or guess a PyTorch/CUDA build.
+- **Evidence:** [script guide](scripts/README.md),
+  [shared execution helper](scripts/h1_common.ps1),
+  [wrapper checks](tests/test_h1_scripts.py).
+- **Verification boundary:** seven targeted wrapper checks passed under Windows
+  PowerShell 5.1; the actual default smoke wrapper also ran the nine existing
+  H1 interface tests successfully. Native argument forwarding and failure handling
+  were checked without model construction. Installation was previewed, not run;
+  no new accuracy training, CUDA validation, full-suite run or human approval is
+  asserted. Scientific Python, checkpoints and published metrics were unchanged.
 
 # AI_USAGE — Jinqi Consequential-Interaction Ledger
 
